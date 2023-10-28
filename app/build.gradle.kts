@@ -1,3 +1,9 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
+val propertiesFile = rootProject.file("gradle.properties")
+val properties = Properties()
+properties.load(propertiesFile.reader())
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -16,9 +22,6 @@ android {
         applicationId = "com.bumblebeeai.spire"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -70,6 +73,8 @@ android {
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
             }
+            versionName = properties.getProperty("VERSION_NAME_STAGING")
+            versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_STAGING"))
         }
 
         create("production") {
@@ -77,6 +82,8 @@ android {
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 mappingFileUploadEnabled = true
             }
+            versionName = properties.getProperty("VERSION_NAME_PRODUCTION")
+            versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_PRODUCTION"))
         }
     }
 }
@@ -123,4 +130,36 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
+}
+
+tasks.register("increaseStagingVersionCode") {
+    doLast {
+        val versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_STAGING")) + 1
+        val versionName = properties.getProperty("VERSION_NAME_STAGING").split(".").toMutableList()
+        val last = Integer.parseInt(versionName[versionName.size - 1])
+        versionName[versionName.size - 1] = (last + 1).toString()
+        val versionNameStr = versionName.joinToString(".")
+
+        properties.setProperty("VERSION_CODE_STAGING", versionCode.toString())
+        properties.setProperty("VERSION_NAME_STAGING", versionNameStr)
+        propertiesFile.outputStream().use {
+            properties.store(it, "Updated version properties")
+        }
+    }
+}
+
+tasks.register("increaseProductionVersionCode") {
+    doLast {
+        val versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_STAGING")) + 1
+        val versionName = properties.getProperty("VERSION_NAME_STAGING").split(".").toMutableList()
+        val last = Integer.parseInt(versionName[versionName.size - 1])
+        versionName[versionName.size - 1] = (last + 1).toString()
+        val versionNameStr = versionName.joinToString(".")
+
+        properties.setProperty("VERSION_CODE_STAGING", versionCode.toString())
+        properties.setProperty("VERSION_NAME_STAGING", versionNameStr)
+        propertiesFile.outputStream().use {
+            properties.store(it, "Updated version properties")
+        }
+    }
 }
