@@ -1,0 +1,30 @@
+#upload qa flavour  apk to firebase app tester using github actions
+name: Firebase App Tester QA
+on:
+  push:
+    branches:
+      - "test"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Build QA Flavour APK
+        run: ./gradlew assembleQaDebug
+      - name: Upload QA Flavour APK to Firebase App Tester
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.QA_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          groups: qa-internal
+          releaseNotes: ${{ github.event.head_commit.message }}
+          file: app/build/outputs/apk/qa/debug/app-qa-debug.apk
