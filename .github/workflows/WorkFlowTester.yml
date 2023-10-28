@@ -18,6 +18,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: increment Staging Version 
+        run: ./gradlew increaseStagingVersionCode
       - name: Build Staging Flavour APK
         run: ./gradlew assembleQaDebug
       - name: Upload Staging Flavour APK to Firebase App Tester
