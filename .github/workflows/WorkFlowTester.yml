@@ -3,7 +3,7 @@ name: Firebase App Tester Staging
 on:
   push:
     branches:
-      - "test"
+      - "main"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,13 +18,15 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Build Staging Flavour APK
-        run: ./gradlew assembleStagingDebug
-      - name: Upload Staging Flavour APK to Firebase App Tester
+      - name: Increment Production Version
+        run: ./gradlew increaseProductionVersionCode
+      - name: Build Production Flavour APK
+        run: ./gradlew assembleProductionDebug
+      - name: Upload Production Flavour APK to Firebase App Tester
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: staging
           releaseNotes: ${{ github.event.head_commit.message }}
-          file: app/build/outputs/apk/staging/debug/app-staging-debug.apk
+          file: app/build/outputs/apk/production/debug/app-production-debug.apk
