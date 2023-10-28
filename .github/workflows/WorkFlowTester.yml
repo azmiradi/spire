@@ -27,6 +27,6 @@ jobs:
         with:
           appId: ${{ secrets.APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-          groups: test
+          groups: staging
           releaseNotes: ${{ github.event.head_commit.message }}
           file: app/build/outputs/apk/staging/debug/app-staging-debug.apk
