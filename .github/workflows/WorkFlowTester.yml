@@ -21,7 +21,7 @@ jobs:
       - name: increase Staging Version 
         run: ./gradlew increaseStagingVersionCode
       - name: Build Staging Flavour APK
-        run: ./gradlew assembleQaDebug
+        run: ./gradlew assembleStagingDebug
       - name: Upload Staging Flavour APK to Firebase App Tester
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
