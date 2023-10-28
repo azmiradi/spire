@@ -1,5 +1,5 @@
 #upload qa flavour  apk to firebase app tester using github actions
-name: Firebase App Tester QA
+name: Firebase App Tester Staging
 on:
   push:
     branches:
@@ -18,13 +18,13 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Build QA Flavour APK
+      - name: Build Staging Flavour APK
         run: ./gradlew assembleQaDebug
-      - name: Upload QA Flavour APK to Firebase App Tester
+      - name: Upload Staging Flavour APK to Firebase App Tester
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          appId: ${{ secrets.QA_APP_ID }}
+          appId: ${{ secrets.APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: qa-internal
           releaseNotes: ${{ github.event.head_commit.message }}
-          file: app/build/outputs/apk/qa/debug/app-qa-debug.apk
+          file: app/build/outputs/apk/qa/debug/app-staging-debug.apk
