@@ -1,4 +1,4 @@
-package com.bumblebeeai.spire.commoen_files.ui.theme
+package com.bumblebeeai.spire.common.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

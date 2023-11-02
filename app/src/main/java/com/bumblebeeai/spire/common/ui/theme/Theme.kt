@@ -1,4 +1,4 @@
-package com.bumblebeeai.spire.commoen_files.ui.theme
+package com.bumblebeeai.spire.common.ui.theme
 
 import android.app.Activity
 import android.os.Build
