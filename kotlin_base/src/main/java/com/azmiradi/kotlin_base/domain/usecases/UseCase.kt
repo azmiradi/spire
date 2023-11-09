@@ -2,7 +2,6 @@ package com.azmiradi.kotlin_base.domain.usecases
 
 import com.azmiradi.kotlin_base.data.exception.BaseException
 import com.azmiradi.kotlin_base.data.models.Resource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -21,12 +20,7 @@ import kotlinx.coroutines.flow.Flow
 abstract class UseCase<Domain, in Body> {
 
     abstract operator fun invoke(
-        scope: CoroutineScope, body: Body? = null, multipleInvoke: Boolean = false,
-        onResult: (Resource<Domain>) -> Unit = {}
-    )
-
-    abstract operator fun invoke(
-        body: Body? = null, multipleInvoke: Boolean = false
+        body: Body? = null,
     ): Flow<Resource<Domain>>
 
     protected open fun invokeSuccessState(domain: Domain): Resource<Domain> {

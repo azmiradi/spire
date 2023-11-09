@@ -1,5 +1,5 @@
 package com.azmiradi.kotlin_base.domain.repository.local.keyValue
 
-interface StorageKey {
+interface IKeyValue {
     val keyValue: String
 }

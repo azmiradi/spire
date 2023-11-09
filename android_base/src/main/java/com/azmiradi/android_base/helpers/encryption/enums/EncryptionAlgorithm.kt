@@ -11,13 +11,18 @@ internal enum class EncryptionAlgorithm(
         "RSA",
         padding = KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
     ),
-    AES_CBC_PKCS7(
+    AES_GCM_NO_PADDING(
+        "AES",
+        blockMode = KeyProperties.BLOCK_MODE_GCM,
+        padding = KeyProperties.ENCRYPTION_PADDING_NONE,
+    ),
+    AES_CBC_PKCS7_PADDING(
         "AES",
         blockMode = KeyProperties.BLOCK_MODE_CBC,
         padding = KeyProperties.ENCRYPTION_PADDING_PKCS7,
     );
 
     fun getTransformation(): String {
-        return algorithm + blockMode + padding
+        return "$algorithm/$blockMode/$padding"
     }
 }

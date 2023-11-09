@@ -16,26 +16,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+val TextFiledContainerColor = Color(0xffffffff)
+val TitleColor = Color(0xff4D4D4D)
+
 private val darkColorScheme = darkColorScheme(
     primary = Color(0xFF3A6EB9),
     secondary = Color(0xFFF9F9F9),
     tertiary = Color(0xFFACB1C0),
-    background = Color(0xFFF9F9F9)
+    background = Color(0xFFF9F9F9),
+    outline = Color(0xffEBECED),
+    surfaceVariant = Color(0xffF9F9F9)
 )
 
 private val lightColorScheme = lightColorScheme(
     primary = Color(0xFF3A6EB9),
     secondary = Color(0xFFF9F9F9),
     tertiary = Color(0xFFACB1C0),
-    background = Color(0xFFF9F9F9)
+    background = Color(0xFFF9F9F9),
+    outline = Color(0xffEBECED),
+    surfaceVariant = Color(0xffF9F9F9)
 )
 
 @Composable
 fun SpireTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -43,8 +50,13 @@ fun SpireTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> darkColorScheme
-        else -> lightColorScheme
+        darkTheme -> {
+            darkColorScheme
+        }
+
+        else -> {
+            lightColorScheme
+        }
     }
     val view = LocalView.current
     if (!view.isInEditMode) {

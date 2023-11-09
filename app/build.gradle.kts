@@ -53,7 +53,20 @@ android {
     }
 
     buildTypes {
+
         debug {
+            isMinifyEnabled = true
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        release {
             isMinifyEnabled = true
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
@@ -76,6 +89,7 @@ android {
             }
             versionName = properties.getProperty("VERSION_NAME_STAGING")
             versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_STAGING"))
+            buildConfigField("String", "BASE_URL", "\"https://pqziebouzf.execute-api.eu-west-1.amazonaws.com/api/spire_driver_app/\"")
         }
 
         create("production") {
@@ -85,6 +99,7 @@ android {
             }
             versionName = properties.getProperty("VERSION_NAME_PRODUCTION")
             versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_PRODUCTION"))
+            buildConfigField("String", "BASE_URL", "\"https://pqziebouzf.execute-api.eu-west-1.amazonaws.com/api/spire_driver_app/\"")
         }
     }
 }
@@ -126,11 +141,20 @@ dependencies {
     //hilt dependency
     implementation("com.google.dagger:hilt-android:2.46")
     kapt("com.google.dagger:hilt-android-compiler:2.46")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.5")
+
+    implementation("com.google.dagger:hilt-android:2.46")
+    kapt("com.google.dagger:hilt-android-compiler:2.46")
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
 }
 
 tasks.register("increaseStagingVersionCode") {

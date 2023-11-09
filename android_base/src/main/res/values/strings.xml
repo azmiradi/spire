@@ -2,4 +2,5 @@
 <resources>
     <string name="error_io_unexpected_message">Oops! Something went wrong while performing some operations. Please try again</string>
     <string name="error_unexpected_message">Unexpected error occurred. We are working on it.</string>
+    <string name="key_store_not_found">KeyStore Not Found</string>
 </resources>

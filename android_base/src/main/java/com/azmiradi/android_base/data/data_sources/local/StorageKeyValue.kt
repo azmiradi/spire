@@ -6,48 +6,66 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.azmiradi.android_base.R
-import com.azmiradi.android_base.helpers.encryption.CryptoOperations
 import com.azmiradi.kotlin_base.data.exception.BaseException
 import com.azmiradi.kotlin_base.domain.encryption.ICryptoOperations
+import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IKeyValue
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
-import com.azmiradi.kotlin_base.domain.repository.local.keyValue.StorageKey
 import com.azmiradi.kotlin_base.utilities.extensions.decodeFromBase64
 import com.azmiradi.kotlin_base.utilities.extensions.encodeToBase64
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import java.util.Date
+import javax.inject.Inject
 
 
-class StorageKeyValue(
+class StorageKeyValue @Inject constructor(
    private val dataStore: DataStore<Preferences>,
    private val cryptoOperations: ICryptoOperations,
 ) : IStorageKeyValue() {
 
    override suspend fun saveSecuredValue(
-      storageKey: StorageKey,
-      keyAlias: String,
+      storageKey: IKeyValue,
+      keyAlias: IKeyValue,
       value: ByteArray,
+      authenticationRequired: Boolean,
+      keyValidityEnd: Date?,
    ) {
-      dataStore.secureEdit(keyAlias, value) { preference, byteArray ->
+      dataStore.secureEdit(
+         keyAlias.keyValue,
+         value,
+         authenticationRequired = authenticationRequired,
+         keyValidityEnd = keyValidityEnd
+      ) { preference, byteArray ->
          preference[stringPreferencesKey(storageKey.keyValue)] = byteArray.encodeToBase64()
       }
    }
 
-   override suspend fun getSecuredValue(storageKey: StorageKey, keyAlias: String): ByteArray {
-      return dataStore.data.secureMap(keyAlias, fetchValue = { value ->
+   override suspend fun getSecuredValue(
+      storageKey: IKeyValue,
+      keyAlias: IKeyValue,
+   ): ByteArray {
+      return dataStore.data.secureMap(keyAlias.keyValue, fetchValue = { value ->
          value[stringPreferencesKey(storageKey.keyValue)]
       }).firstOrNull()
          ?: throw BaseException.Local.NotFoundData(R.string.error_io_unexpected_message)
    }
 
-
    /////////////////////////////////////////////////////////////
 
    private suspend inline fun DataStore<Preferences>.secureEdit(
-      keyAlias: String, value: ByteArray,
+      keyAlias: String,
+      value: ByteArray,
+      authenticationRequired: Boolean = false,
+      keyValidityEnd: Date? = null,
       crossinline editStore: (MutablePreferences, ByteArray) -> Unit,
    ) = edit {
-      val encryptedValue = cryptoOperations.encryptDataWithAES(keyAlias, value)
+      val encryptedValue = cryptoOperations.encryptDataWithAES(
+         keyAlias = keyAlias,
+         data = value,
+         authenticationRequired = authenticationRequired,
+         keyValidityEnd = keyValidityEnd
+      )
       editStore.invoke(it, encryptedValue)
    }
 
@@ -57,9 +75,13 @@ class StorageKeyValue(
     * deserializes data into respective data type
     */
    private inline fun Flow<Preferences>.secureMap(
-      keyAlias: String, crossinline fetchValue: (value: Preferences) -> String?,
+      keyAlias: String,
+      crossinline fetchValue: (value: Preferences) -> String?,
    ): Flow<ByteArray?> = map { prefs ->
       if (fetchValue(prefs).isNullOrEmpty()) null
-      else cryptoOperations.encryptDataWithAES(keyAlias, fetchValue(prefs)!!.decodeFromBase64())
+      else cryptoOperations.decryptDataWithAES(
+         keyAlias = keyAlias,
+         data = fetchValue(prefs)!!.decodeFromBase64()
+      )
    }
 }

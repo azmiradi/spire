@@ -9,6 +9,5 @@ object AppConfiguration {
         this.localStorageName = localStorageName
         this.baseURL = baseURL
         this.connectTimeoutSec = connectTimeoutSec
-
     }
 }

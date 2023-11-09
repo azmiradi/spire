@@ -9,31 +9,8 @@ import kotlinx.coroutines.launch
 
 abstract class UseCaseRemoteThenCache<Domain, in Body> : UseCaseRemote<Domain, Body>() {
 
-    override operator fun invoke(
-        scope: CoroutineScope, body: Body?, multipleInvoke: Boolean,
-        onResult: (Resource<Domain>) -> Unit
-    ) {
-        scope.launch(Dispatchers.Main) {
-            if (multipleInvoke.not())
-                onResult.invoke(Resource.loading())
-
-            runFlow(executeRemoteDS(body), onResult).collect {
-                if (performLocalOperation(it))
-                    executeLocalOperation(it, body)
-
-                onResult.invoke(invokeSuccessState(it))
-
-                if (multipleInvoke.not())
-                    onResult.invoke(Resource.loading(false))
-            }
-        }
-    }
-
-    override operator fun invoke(body: Body?, multipleInvoke: Boolean): Flow<Resource<Domain>> =
+    override operator fun invoke(body: Body?): Flow<Resource<Domain>> =
         channelFlow {
-            if (multipleInvoke.not())
-                send(Resource.loading())
-
             runFlow(executeRemoteDS(body)) {
                 send(it)
             }.collect {
@@ -41,9 +18,6 @@ abstract class UseCaseRemoteThenCache<Domain, in Body> : UseCaseRemote<Domain, B
                     executeLocalOperation(it, body)
 
                 send(invokeSuccessState(it))
-
-                if (multipleInvoke.not())
-                    send(Resource.loading(false))
             }
         }
 

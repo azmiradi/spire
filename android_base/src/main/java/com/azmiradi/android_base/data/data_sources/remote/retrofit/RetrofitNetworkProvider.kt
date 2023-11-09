@@ -51,39 +51,42 @@ class RetrofitNetworkProvider(private val apiService: ApiService) : INetworkProv
         responseWrappedModel: Type, pathUrl: String, headers: Map<String, Any>?,
         queryParams: Map<String, Any>?, requestBody: RequestBody?
     ): ResponseBody {
-        val response = apiService.put(
-            pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
-            queryParams = queryParams ?: hashMapOf(), body = requestBody ?: Unit
-        )
-        return response.string().getModelFromJSON(responseWrappedModel)
+//        val response = apiService.put(
+//            pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
+//            queryParams = queryParams ?: hashMapOf(), body = requestBody ?: Unit
+//        )
+//        return response.string().getModelFromJSON(responseWrappedModel)
+    TODO()
     }
 
     override suspend fun <ResponseBody> get(
         responseWrappedModel: Type, pathUrl: String, headers: Map<String, Any>?,
         queryParams: Map<String, Any>?
     ): ResponseBody {
-        val response = apiService.get(
-            pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
-            queryParams = queryParams ?: hashMapOf()
-        )
-        return response.string().getModelFromJSON(responseWrappedModel)
+//        val response = apiService.get(
+//            pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
+//            queryParams = queryParams ?: hashMapOf()
+//        )
+//        return response.string().getModelFromJSON(responseWrappedModel)
+    TODO()
     }
 
     override suspend fun <ResponseBody> getWithHeaderResponse(
         responseWrappedModel: Type, pathUrl: String, headers: Map<String, Any>?,
         queryParams: Map<String, Any>?
     ): Pair<ResponseBody, Map<String, String>> {
-        val response = apiService.getWithHeaderResponse(
-            pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
-            queryParams = queryParams ?: hashMapOf()
-        )
-        return when {
-            response.isSuccessful -> Pair(
-                (response.body() ?: "".toResponseBody()).string()
-                    .getModelFromJSON(responseWrappedModel), response.headers().toMap()
-            )
-
-            else -> throw HttpException(response)
-        }
+//        val response = apiService.getWithHeaderResponse(
+//            pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
+//            queryParams = queryParams ?: hashMapOf()
+//        )
+//        return when {
+//            response.isSuccessful -> Pair(
+//                (response.body() ?: "".toResponseBody()).string()
+//                    .getModelFromJSON(responseWrappedModel), response.headers().toMap()
+//            )
+//
+//            else -> throw HttpException(response)
+//        }
+        TODO()
     }
 }

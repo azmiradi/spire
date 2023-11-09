@@ -1,9 +1,7 @@
 package com.bumblebeeai.spire.common.di
 
-
 import com.azmiradi.android_base.configuration.AppConfiguration
 import com.azmiradi.android_base.configuration.AppConfiguration.connectTimeoutSec
-import com.azmiradi.android_base.data.data_sources.local.StorageKeyValue
 import com.azmiradi.android_base.data.data_sources.remote.factory.CustomCallAdapterFactory
 import com.azmiradi.android_base.data.data_sources.remote.retrofit.ApiService
 import com.azmiradi.android_base.data.data_sources.remote.retrofit.HeadersInterceptor
@@ -11,8 +9,9 @@ import com.azmiradi.android_base.data.data_sources.remote.retrofit.RetrofitNetwo
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
 import com.azmiradi.kotlin_base.domain.repository.remote.INetworkProvider
 import com.bumblebeeai.spire.BuildConfig
+import com.bumblebeeai.spire.common.keys.KeyAliasValue
+import com.bumblebeeai.spire.common.keys.KeyValue
 import com.google.gson.Gson
-import com.bumblebeeai.spire.common.qualifiers.RequestHeaders
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,7 +32,6 @@ object NetworkModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient.Builder,
     ): Retrofit {
-        okHttpClient.connectionSpecs(arrayListOf(ConnectionSpec.CLEARTEXT))
         return Retrofit.Builder()
             .client(okHttpClient.build())
             .baseUrl(AppConfiguration.baseURL)
@@ -62,7 +60,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHeadersInterceptor(storageKeyValue: IStorageKeyValue): HeadersInterceptor {
-        return HeadersInterceptor(storageKeyValue.getSecuredValue())
+        return HeadersInterceptor {
+            mapOf(
+                "Authorization" to "Bearer " + storageKeyValue.getSecuredValue(
+                    KeyValue.TOKEN, KeyAliasValue.TOKEN
+                )
+            )
+        }
     }
 
     @Provides
@@ -74,9 +78,6 @@ object NetworkModule {
         OkHttpClient().newBuilder().apply {
             connectTimeout(connectTimeoutSec, TimeUnit.SECONDS)
             retryOnConnectionFailure(true)
-            connectionPool(
-                ConnectionPool(connectTimeoutSec.toInt(), 500000, TimeUnit.MILLISECONDS)
-            )
             readTimeout(connectTimeoutSec, TimeUnit.SECONDS)
             writeTimeout(connectTimeoutSec, TimeUnit.SECONDS)
             addInterceptor(httpLoggingInterceptor)

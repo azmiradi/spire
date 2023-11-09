@@ -7,9 +7,14 @@ import java.util.Date
 import javax.crypto.SecretKey
 
 interface IKeyStoreManger {
-    fun getPublicKey(keyAlias: String, keyValidityEnd: Date?=null): PublicKey
+    fun getPublicKey(keyAlias: String, keyValidityEnd: Date? = null): PublicKey
     fun getPrivateKey(keyAlias: String, keyValidityEnd: Date? = null): PrivateKey
     fun getCertification(keyAlias: String): Certificate?
-    fun getSecretKey(keyAlias: String, keyValidityEnd: Date? = null):SecretKey
+    fun getSecretKey(
+        keyAlias: String,
+        keyValidityEnd: Date? = null,
+        authenticationRequired: Boolean? = null,
+    ): SecretKey
+
     fun removeKeyStore(keyAlias: String)
 }

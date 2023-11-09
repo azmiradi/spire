@@ -14,35 +14,13 @@ abstract class UseCaseLocal<Domain, in Body> : UseCase<Domain, Body>() {
 
     protected abstract fun executeLocalDS(body: Body? = null): Flow<Domain>
 
-    override operator fun invoke(
-        scope: CoroutineScope, body: Body?, multipleInvoke: Boolean,
-        onResult: (Resource<Domain>) -> Unit
-    ) {
-        scope.launch(Dispatchers.Main) {
-            if (multipleInvoke.not())
-                onResult.invoke(Resource.loading())
-
-            runFlow(executeLocalDS(body), onResult).collect {
-                onResult.invoke(invokeSuccessState(it))
-
-                if (multipleInvoke.not())
-                    onResult.invoke(Resource.loading(false))
-            }
-        }
-    }
-
-    override operator fun invoke(body: Body?, multipleInvoke: Boolean): Flow<Resource<Domain>> =
+    override operator fun invoke(body: Body?): Flow<Resource<Domain>> =
         channelFlow {
-            if (multipleInvoke.not())
-                send(Resource.loading())
-
+            send(Resource.loading())
             runFlow(executeLocalDS(body)) {
                 send(it)
             }.collect {
                 send(invokeSuccessState(it))
-
-                if (multipleInvoke.not())
-                    send(Resource.loading(false))
             }
         }
 

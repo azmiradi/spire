@@ -1,6 +1,7 @@
 package com.azmiradi.kotlin_base.domain.repository.local.keyValue
 
 import java.lang.reflect.Type
+import java.util.Date
 
 
 abstract class IStorageKeyValue {
@@ -11,7 +12,10 @@ abstract class IStorageKeyValue {
      * @param keyAlias the value used to get/create crypto key and use it to encrypt the date.
      * @return the encrypted value.
      */
-    open suspend fun getSecuredValue(storageKey: StorageKey, keyAlias: String): ByteArray =
+    open suspend fun getSecuredValue(
+        storageKey: IKeyValue,
+        keyAlias: IKeyValue,
+    ): ByteArray =
         throw NotImplementedError("override and implement this method")
 
     /**
@@ -20,48 +24,55 @@ abstract class IStorageKeyValue {
      * @param storageKey the key which holds the encrypted value.
      * @param keyAlias the value used to get/create crypto key and use it to encrypt the date.
      */
-    open suspend fun saveSecuredValue(storageKey: StorageKey, keyAlias: String, value: ByteArray) {
+    open suspend fun saveSecuredValue(
+        storageKey: IKeyValue,
+        keyAlias: IKeyValue,
+        value: ByteArray,
+        authenticationRequired: Boolean = false,
+        keyValidityEnd: Date? = null,
+    ) {
         throw NotImplementedError("override and implement this method")
     }
 
-    open suspend fun getString(storageKey: StorageKey): String =
+
+    open suspend fun getString(storageKey: IKeyValue): String =
         throw NotImplementedError("override and implement this method")
 
-    open suspend fun saveString(storageKey: StorageKey, value: String) {
-        throw NotImplementedError("override and implement this method")
-    }
-
-    open suspend fun clearString(storageKey: StorageKey) {
+    open suspend fun saveString(storageKey: IKeyValue, value: String) {
         throw NotImplementedError("override and implement this method")
     }
 
-    open suspend fun getInt(storageKey: StorageKey): Int? {
+    open suspend fun clearString(storageKey: IKeyValue) {
         throw NotImplementedError("override and implement this method")
     }
 
-    open suspend fun saveInt(storageKey: StorageKey, value: Int) {
+    open suspend fun getInt(storageKey: IKeyValue): Int? {
         throw NotImplementedError("override and implement this method")
     }
 
-    open suspend fun clearInt(storageKey: StorageKey) {
+    open suspend fun saveInt(storageKey: IKeyValue, value: Int) {
         throw NotImplementedError("override and implement this method")
     }
 
-    open suspend fun getBoolean(storageKey: StorageKey): Boolean? =
-        throw NotImplementedError("override and implement this method")
-
-    open suspend fun saveBoolean(storageKey: StorageKey, value: Boolean) {
+    open suspend fun clearInt(storageKey: IKeyValue) {
         throw NotImplementedError("override and implement this method")
     }
 
-    open suspend fun <Model> getModelBasedOnType(storageKey: StorageKey, tokenType: Type): Model? =
+    open suspend fun getBoolean(storageKey: IKeyValue): Boolean? =
         throw NotImplementedError("override and implement this method")
 
-    open suspend fun <Model> saveModelBasedOnType(storageKey: StorageKey, value: Model) {
+    open suspend fun saveBoolean(storageKey: IKeyValue, value: Boolean) {
         throw NotImplementedError("override and implement this method")
     }
 
-    open suspend fun hasKey(storageKey: StorageKey): Boolean =
+    open suspend fun <Model> getModelBasedOnType(storageKey: IKeyValue, tokenType: Type): Model? =
+        throw NotImplementedError("override and implement this method")
+
+    open suspend fun <Model> saveModelBasedOnType(storageKey: IKeyValue, value: Model) {
+        throw NotImplementedError("override and implement this method")
+    }
+
+    open suspend fun hasKey(storageKey: IKeyValue): Boolean =
         throw NotImplementedError("override and implement this method")
 
     open suspend fun clearAllEntries() {

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">spire</string>
+    <string name="logo">Logo\n</string>
+    <string name="welcome_to_spire">Welcome to Spire!</string>
+    <string name="forget_password">Forget password?</string>
+    <string name="login">Login</string>
 </resources>

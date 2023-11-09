@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class StateViewModel<Data> : ViewModel() {
+open class StateViewModel<Data> : ViewModel() {
 
     private val _viewState: MutableStateFlow<ViewState<Data>?> = MutableStateFlow(null)
     val viewState: StateFlow<ViewState<Data>?> = _viewState
@@ -25,14 +25,9 @@ class StateViewModel<Data> : ViewModel() {
         }
     }
 
-    fun clearData() {
+     fun clearData() {
         viewModelScope.launch(Dispatchers.Main) {
             _viewState.emit(null)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        clearData()
     }
 }
