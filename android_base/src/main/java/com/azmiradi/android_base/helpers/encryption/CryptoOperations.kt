@@ -33,13 +33,16 @@ class CryptoOperations(private val keyStoreManger: IKeyStoreManger) : ICryptoOpe
         data: ByteArray,
         authenticationRequired: Boolean,
     ): ByteArray {
+        val encryptionAlgorithm = EncryptionAlgorithm.AES_GCM_NO_PADDING
+
         val secretKey = keyStoreManger.getSecretKey(
             keyAlias = keyAlias,
             keyValidityEnd = keyValidityEnd,
             authenticationRequired = authenticationRequired
         )
+
         val cipher =
-            Cipher.getInstance(EncryptionAlgorithm.AES_CBC_PKCS7_PADDING.getTransformation())
+            Cipher.getInstance(encryptionAlgorithm.getTransformation())
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
         val ivBytes = cipher.iv
         val encryptedBytes = cipher.doFinal(data)
@@ -47,11 +50,13 @@ class CryptoOperations(private val keyStoreManger: IKeyStoreManger) : ICryptoOpe
     }
 
     override fun decryptDataWithAES(keyAlias: String, data: ByteArray): ByteArray {
+        val encryptionAlgorithm = EncryptionAlgorithm.AES_GCM_NO_PADDING
+
         val secretKey = keyStoreManger.getSecretKey(keyAlias)
         val cryptoData = data.decodeToString().getModelFromJSON<CryptoData>(CryptoData::class.java)
 
         val cipher =
-            Cipher.getInstance(EncryptionAlgorithm.AES_CBC_PKCS7_PADDING.getTransformation())
+            Cipher.getInstance(encryptionAlgorithm.getTransformation())
         val spec = IvParameterSpec(cryptoData.iv)
         cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
         return cipher.doFinal(cryptoData.data)

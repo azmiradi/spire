@@ -1,6 +1,5 @@
 package com.azmiradi.android_base.helpers.encryption
 
-import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import com.azmiradi.android_base.helpers.encryption.enums.EncryptionAlgorithm
@@ -36,45 +35,6 @@ class KeyStoreManger : IKeyStoreManger {
         }.generateKeyPair()
     }
 
-    private fun createSecretKey(
-        keyAlias: String,
-        keyValidityEnd: Date?,
-        authenticationRequired: Boolean = false,
-    ): SecretKey {
-        val keyGenerator =
-            KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-        val keyGenParameterSpec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            KeyGenParameterSpec.Builder(
-                keyAlias,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-            )
-                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                .setUserAuthenticationRequired(true)
-                .setRandomizedEncryptionRequired(true)
-                .setInvalidatedByBiometricEnrollment(true)
-                .setUserAuthenticationParameters(
-                    100,
-                    KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL
-                )
-                .build()
-        } else {
-            KeyGenParameterSpec.Builder(
-                keyAlias,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-            )
-                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                .setRandomizedEncryptionRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(100)
-                .setUserAuthenticationRequired(true)
-                .setInvalidatedByBiometricEnrollment(true)
-                .build()
-        }
-        keyGenerator.init(keyGenParameterSpec)
-        return keyGenerator.generateKey()
-    }
-
     override fun getPublicKey(keyAlias: String, keyValidityEnd: Date?): PublicKey {
         val publicKey: PublicKey? = keyStore.getCertificate(keyAlias)?.publicKey
         return publicKey ?: createKeyPair(
@@ -100,12 +60,22 @@ class KeyStoreManger : IKeyStoreManger {
         keyValidityEnd: Date?,
         authenticationRequired: Boolean?,
     ): SecretKey {
-        val existingKey = keyStore.getEntry(keyAlias, null) as? KeyStore.SecretKeyEntry
-        return existingKey?.secretKey ?: createSecretKey(
-            keyAlias,
-            keyValidityEnd,
-            authenticationRequired ?: false
-        )
+        keyStore.getKey(keyAlias, null)?.let { return it as SecretKey }
+        val encryptionAlgorithm = EncryptionAlgorithm.AES_GCM_NO_PADDING
+
+        return KeyGenerator.getInstance(encryptionAlgorithm.algorithm, "AndroidKeyStore")
+            .apply {
+                val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+                    keyAlias,
+                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                )
+                    .setBlockModes(encryptionAlgorithm.blockMode)
+                    .setEncryptionPaddings(encryptionAlgorithm.padding)
+                    .setUserAuthenticationRequired(authenticationRequired == true)
+                    .setKeyValidityEnd(keyValidityEnd)
+                    .build()
+                init(keyGenParameterSpec)
+            }.generateKey()
     }
 
 

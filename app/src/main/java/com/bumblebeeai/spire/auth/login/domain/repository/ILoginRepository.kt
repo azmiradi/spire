@@ -7,4 +7,5 @@ internal interface ILoginRepository  {
     suspend fun login(loginRequest: LoginRequest): Login
     suspend fun saveToken(token: String)
     suspend fun saveMerchantId(merchantId: String)
+    suspend fun saveLogin(loginRequest: LoginRequest)
 }

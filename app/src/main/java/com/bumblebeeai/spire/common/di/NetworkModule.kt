@@ -9,8 +9,7 @@ import com.azmiradi.android_base.data.data_sources.remote.retrofit.RetrofitNetwo
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
 import com.azmiradi.kotlin_base.domain.repository.remote.INetworkProvider
 import com.bumblebeeai.spire.BuildConfig
-import com.bumblebeeai.spire.common.keys.KeyAliasValue
-import com.bumblebeeai.spire.common.keys.KeyValue
+import com.bumblebeeai.spire.auth.login.domain.models.keys.KeyValue
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides

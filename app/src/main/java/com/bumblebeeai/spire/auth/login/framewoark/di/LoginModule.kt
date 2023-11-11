@@ -1,4 +1,4 @@
-package com.bumblebeeai.spire.auth.login.di
+package com.bumblebeeai.spire.auth.login.framewoark.di
 
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
 import com.azmiradi.kotlin_base.domain.repository.remote.INetworkProvider

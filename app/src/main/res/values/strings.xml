@@ -4,4 +4,10 @@
     <string name="welcome_to_spire">Welcome to Spire!</string>
     <string name="forget_password">Forget password?</string>
     <string name="login">Login</string>
+    <string name="phone">Phone</string>
+    <string name="password">Password</string>
+    <string name="phone_invalid">Phone Number is Invalid</string>
+    <string name="password_invalid">Password Format is Invalid</string>
+    <string name="not_found_data">Not Found Data</string>
+    <string name="email_not_valid">Email invalid</string>
 </resources>

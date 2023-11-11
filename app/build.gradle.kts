@@ -154,7 +154,9 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.46")
     kapt("com.google.dagger:hilt-android-compiler:2.46")
-    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation("androidx.biometric:biometric:1.0.1")
+
+    implementation ("androidx.compose.material:material-icons-extended:1.5.4")
 }
 
 tasks.register("increaseStagingVersionCode") {
