@@ -1,5 +1,6 @@
-package com.azmiradi.android_base.data.data_sources.remote.factory
+package com.azmiradi.android_base.data.data_sources.remote.retrofit.factory
 
+import android.util.Log
 import com.azmiradi.android_base.R
 import com.azmiradi.kotlin_base.data.exception.BaseException
 import okhttp3.ResponseBody
@@ -12,11 +13,11 @@ import java.net.UnknownHostException
 
 class CustomCall(
     private val delegate: Call<ResponseBody>,
-    private val errorConverter: Converter<ResponseBody, BaseException>
+    private val errorConverter: Converter<ResponseBody, Any>,
 ) : Call<ResponseBody> by delegate {
 
     override fun execute(): retrofit2.Response<ResponseBody> {
-        throw UnsupportedOperationException("LeonCall doesn't support execute()")
+        throw UnsupportedOperationException("BaseException doesn't support execute()")
     }
 
     override fun clone(): Call<ResponseBody> {
@@ -37,6 +38,7 @@ class CustomCall(
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("CustomCall", t.message ?: "")
                 val exception = when (t) {
                     is SocketTimeoutException, is UnknownHostException, is IOException -> BaseException.Network.Retrial(
                         messageRes = R.string.error_io_unexpected_message,
@@ -71,10 +73,9 @@ class CustomCall(
         return if (errorBody == null) BaseException.Client.Unhandled(
             httpErrorCode = code, "There is no error body for this code."
         ) else try {
-            errorConverter.convert(errorBody)
-                ?: BaseException.Client.Unhandled(
-                    httpErrorCode = code, "Error body could not be converted."
-                )
+            BaseException.Client.BodyError(
+                httpErrorCode = code, message = errorBody.string()
+            )
         } catch (e: Exception) {
             BaseException.Client.Unhandled(httpErrorCode = code, e.message)
         }

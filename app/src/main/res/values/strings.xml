@@ -10,4 +10,24 @@
     <string name="password_invalid">Password Format is Invalid</string>
     <string name="not_found_data">Not Found Data</string>
     <string name="email_not_valid">Email invalid</string>
+    <string name="new_tasks">New Tasks</string>
+    <string name="my_tasks">My Tasks</string>
+    <string name="my_account">My Account</string>
+    <string name="help">Help</string>
+    <string name="invalid_login_info">Invalid Login Error</string>
+    <string name="on_duty">On-Duty</string>
+    <string name="no_tasks_here">No tasks here</string>
+    <string name="yet">Yet..</string>
+    <string name="not_found_job_type">Not Found Job Type</string>
+    <string name="add_note">Add notes</string>
+    <string name="notes">Notes</string>
+    <string name="add_outcomes">Add outcomes</string>
+    <string name="outcomes">Outcomes</string>
+    <string name="add_faults">Add faults</string>
+    <string name="faults">Faults</string>
+    <string name="odometer">Odometer</string>
+    <string name="ex15000">15000</string>
+    <string name="upload_images">Upload images</string>
+    <string name="signature">Signature</string>
+    <string name="submit">Submit</string>
 </resources>

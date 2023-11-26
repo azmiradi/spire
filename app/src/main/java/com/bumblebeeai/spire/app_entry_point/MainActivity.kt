@@ -1,43 +1,50 @@
 package com.bumblebeeai.spire.app_entry_point
 
-import android.app.KeyguardManager
-import android.content.Context
 import android.os.Bundle
-import android.widget.Button
-import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.biometric.BiometricPrompt
-import androidx.core.content.ContextCompat
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
-import com.bumblebeeai.spire.R
-import com.bumblebeeai.spire.auth.login.presentation.screens.LoginScreen
+import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
 import com.bumblebeeai.spire.common.ui.theme.SpireTheme
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
-
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-
-        if (keyguardManager.isDeviceSecure) {
-            // The device is secured with a lock screen and user authentication is required.
-
-            // Attempt to access the key or perform the cryptographic operation.
-        } else {
-            // The device is not secured, or the user has not authenticated yet.
-            // Prompt the user to unlock the device or set up security.
-        }
         setContent {
             SpireTheme {
-                LoginScreen()
+                var input by rememberSaveable {
+                    mutableStateOf("")
+                }
+                //NavigationScreensController()
+                Column(modifier = Modifier.fillMaxSize()) {
+                    TextField(value = input,
+                        onValueChange = {
+                            input = it
+                        })
 
+                    Button(onClick = {
+
+                    }) {
+
+                    }
+
+                    Text(text = "")
+                }
             }
         }
 

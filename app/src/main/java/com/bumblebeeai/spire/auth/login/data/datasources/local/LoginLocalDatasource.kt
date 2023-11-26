@@ -4,25 +4,23 @@ import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValu
 import com.azmiradi.kotlin_base.utilities.extensions.toJson
 import com.bumblebeeai.spire.auth.login.domain.models.LoginRequest
 import com.bumblebeeai.spire.auth.login.domain.models.keys.KeyValue
+import com.bumblebeeai.spire.common.domain.model.enums.CommenKeyValue
+
 import javax.inject.Inject
 
 internal class LoginLocalDatasource @Inject constructor(private val storageKeyValue: IStorageKeyValue) :
     ILoginLocalDatasource {
     override suspend fun saveToken(token: String) {
-        storageKeyValue.saveSecuredValue(
-            KeyValue.TOKEN,
-            KeyValue.TOKEN,
-            token.encodeToByteArray(),
-            authenticationRequired = false
+        storageKeyValue.saveString(
+            CommenKeyValue.TOKEN,
+            token,
         )
     }
 
     override suspend fun saveMerchantId(merchantId: String) {
-        storageKeyValue.saveSecuredValue(
-            KeyValue.MERCHANT_ID,
-            KeyValue.MERCHANT_ID,
-            merchantId.encodeToByteArray(),
-            authenticationRequired = false
+        storageKeyValue.saveString(
+            CommenKeyValue.MERCHANT_ID,
+            merchantId
         )
     }
 
@@ -31,7 +29,7 @@ internal class LoginLocalDatasource @Inject constructor(private val storageKeyVa
             KeyValue.LOGIN_INFO,
             KeyValue.LOGIN_INFO,
             loginRequest.toJson().encodeToByteArray(),
-            authenticationRequired = true
+            authenticationRequired = false
         )
     }
 }

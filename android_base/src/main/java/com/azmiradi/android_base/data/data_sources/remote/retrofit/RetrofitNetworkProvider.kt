@@ -26,12 +26,16 @@ class RetrofitNetworkProvider(private val apiService: ApiService) : INetworkProv
             pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
             queryParams = queryParams ?: hashMapOf(), body = requestBody ?: Unit
         )
-        return response.string().getModelFromJSON(responseWrappedModel)
+        val responseStr = response.string()
+        return responseStr.getModelFromJSON(responseWrappedModel)
     }
 
     override suspend fun <ResponseBody, RequestBody> postWithHeaderResponse(
-        responseWrappedModel: Type, pathUrl: String, headers: Map<String, Any>?,
-        queryParams: Map<String, Any>?, requestBody: RequestBody?
+        responseWrappedModel: Type,
+        pathUrl: String,
+        headers: Map<String, Any>?,
+        queryParams: Map<String, Any>?,
+        requestBody: RequestBody?,
     ): Pair<ResponseBody, Map<String, String>> {
         val response = apiService.postWithHeaderResponse(
             pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
@@ -46,6 +50,7 @@ class RetrofitNetworkProvider(private val apiService: ApiService) : INetworkProv
             else -> throw HttpException(response)
         }
     }
+
 
     override suspend fun <ResponseBody, RequestBody> put(
         responseWrappedModel: Type, pathUrl: String, headers: Map<String, Any>?,
@@ -63,12 +68,12 @@ class RetrofitNetworkProvider(private val apiService: ApiService) : INetworkProv
         responseWrappedModel: Type, pathUrl: String, headers: Map<String, Any>?,
         queryParams: Map<String, Any>?
     ): ResponseBody {
-//        val response = apiService.get(
-//            pathUrl = pathUrl, headerMap = headers ?: hashMapOf(),
-//            queryParams = queryParams ?: hashMapOf()
-//        )
-//        return response.string().getModelFromJSON(responseWrappedModel)
-    TODO()
+        val response = apiService.get(
+            pathUrl = pathUrl,
+            headerMap = headers ?: hashMapOf(),
+            queryParams = queryParams ?: hashMapOf()
+        )
+        return response.string().getModelFromJSON(responseWrappedModel)
     }
 
     override suspend fun <ResponseBody> getWithHeaderResponse(
@@ -89,4 +94,19 @@ class RetrofitNetworkProvider(private val apiService: ApiService) : INetworkProv
 //        }
         TODO()
     }
+
+    override suspend fun <ResponseBody> postWitParts(
+        responseWrappedModel: Type,
+        pathUrl: String,
+        partMap: Map<String, Any?>,
+        fileList: List<Any>?,
+        vararg files: Any?
+    ): ResponseBody {
+        val response = apiService.postWitParts(
+            pathUrl, partMap, fileList, files,
+        )
+        return response.string().getModelFromJSON(responseWrappedModel)
+    }
+
+
 }

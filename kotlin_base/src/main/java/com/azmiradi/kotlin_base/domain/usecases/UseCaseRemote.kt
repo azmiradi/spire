@@ -14,7 +14,7 @@ abstract class UseCaseRemote<Domain, in Body> : UseCase<Domain, Body>() {
 
     override operator fun invoke(body: Body?): Flow<Resource<Domain>> =
         channelFlow {
-            send(Resource.loading())
+            send(Resource.Loading)
             runFlow(executeRemoteDS(body)) {
                 send(it)
             }.collect {
@@ -22,11 +22,6 @@ abstract class UseCaseRemote<Domain, in Body> : UseCase<Domain, Body>() {
             }
             close()
         }
-
-    override fun validateResponseModel(domain: Domain): Resource<Domain>? = null
-
-    override suspend fun validateFailureResponse(exception: BaseException): Resource<Domain>? =
-        null
 
     override suspend fun <M> runFlow(
         requestExecution: Flow<M>, onResult: suspend (Resource<Domain>) -> Unit

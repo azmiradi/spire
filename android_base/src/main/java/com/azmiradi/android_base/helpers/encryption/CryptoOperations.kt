@@ -1,5 +1,6 @@
 package com.azmiradi.android_base.helpers.encryption
 
+import android.util.Base64
 import androidx.annotation.Keep
 import com.azmiradi.android_base.helpers.encryption.enums.EncryptionAlgorithm
 import com.azmiradi.kotlin_base.domain.encryption.ICryptoOperations
@@ -9,6 +10,7 @@ import com.azmiradi.kotlin_base.utilities.extensions.toJson
 import java.util.Date
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
+import kotlin.io.encoding.Base64.Default.encodeToByteArray
 
 
 class CryptoOperations(private val keyStoreManger: IKeyStoreManger) : ICryptoOperations {
@@ -33,7 +35,7 @@ class CryptoOperations(private val keyStoreManger: IKeyStoreManger) : ICryptoOpe
         data: ByteArray,
         authenticationRequired: Boolean,
     ): ByteArray {
-        val encryptionAlgorithm = EncryptionAlgorithm.AES_GCM_NO_PADDING
+        val encryptionAlgorithm = EncryptionAlgorithm.AES_CBC_PKCS7_PADDING
 
         val secretKey = keyStoreManger.getSecretKey(
             keyAlias = keyAlias,
@@ -46,15 +48,13 @@ class CryptoOperations(private val keyStoreManger: IKeyStoreManger) : ICryptoOpe
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
         val ivBytes = cipher.iv
         val encryptedBytes = cipher.doFinal(data)
-        return CryptoData(iv = ivBytes, data = encryptedBytes).toJson().encodeToByteArray()
+        return CryptoData(iv = ivBytes, data = encryptedBytes).toJson().toByteArray(Charsets.UTF_8)
     }
 
     override fun decryptDataWithAES(keyAlias: String, data: ByteArray): ByteArray {
-        val encryptionAlgorithm = EncryptionAlgorithm.AES_GCM_NO_PADDING
-
+        val encryptionAlgorithm = EncryptionAlgorithm.AES_CBC_PKCS7_PADDING
         val secretKey = keyStoreManger.getSecretKey(keyAlias)
-        val cryptoData = data.decodeToString().getModelFromJSON<CryptoData>(CryptoData::class.java)
-
+        val cryptoData = data.toString(Charsets.UTF_8).getModelFromJSON<CryptoData>(CryptoData::class.java)
         val cipher =
             Cipher.getInstance(encryptionAlgorithm.getTransformation())
         val spec = IvParameterSpec(cryptoData.iv)

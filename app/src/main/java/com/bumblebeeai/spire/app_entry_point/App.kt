@@ -13,7 +13,8 @@ class App : Application() {
         super.onCreate()
         AppConfiguration.inti(
             localStorageName = "Spire",
-            baseURL = BuildConfig.BASE_URL
+            baseURL = BuildConfig.BASE_URL,
+            connectTimeoutSec = 5
         )
 
     }

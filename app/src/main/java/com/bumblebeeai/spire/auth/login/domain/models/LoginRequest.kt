@@ -1,6 +1,8 @@
 package com.bumblebeeai.spire.auth.login.domain.models
 
+import com.google.errorprone.annotations.Keep
+@Keep
 internal data class LoginRequest(
-    private val phoneNumber: String,
-    private val password: String,
+     val mobile: String,
+     val password: String,
 )

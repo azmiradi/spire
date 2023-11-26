@@ -18,6 +18,8 @@ import androidx.core.view.WindowCompat
 
 val TextFiledContainerColor = Color(0xffffffff)
 val TitleColor = Color(0xff4D4D4D)
+val UnSelectedItemColor = Color(0xff979797)
+val SelectedSwitchColor = Color(0xff81A7DE)
 
 private val darkColorScheme = darkColorScheme(
     primary = Color(0xFF3A6EB9),
@@ -69,7 +71,7 @@ fun SpireTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = CustomTypography,
         content = content
     )
 }

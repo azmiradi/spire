@@ -24,16 +24,12 @@ abstract class UseCase<Domain, in Body> {
     ): Flow<Resource<Domain>>
 
     protected open fun invokeSuccessState(domain: Domain): Resource<Domain> {
-        return validateResponseModel(domain) ?: Resource.success(domain)
+        return Resource.Success(domain)
     }
 
     protected open suspend fun invokeFailureState(exception: BaseException): Resource<Domain> {
-        return validateFailureResponse(exception) ?: Resource.failure(exception)
+        return Resource.Failure(exception)
     }
-
-    protected abstract fun validateResponseModel(domain: Domain): Resource<Domain>?
-
-    protected abstract suspend fun validateFailureResponse(exception: BaseException): Resource<Domain>?
 
     protected abstract suspend fun <M> runFlow(
         requestExecution: Flow<M>, onResult: suspend (Resource<Domain>) -> Unit = {}

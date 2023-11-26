@@ -1,6 +1,5 @@
-package com.azmiradi.android_base.data.data_sources.remote.factory
+package com.azmiradi.android_base.data.data_sources.remote.retrofit.factory
 
-import com.azmiradi.kotlin_base.data.exception.BaseException
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.CallAdapter
@@ -9,10 +8,12 @@ import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-class CustomCallAdapterFactory private constructor() : CallAdapter.Factory() {
+
+class CustomCallAdapterFactory private constructor(private val errorClassType: Type) :
+    CallAdapter.Factory() {
     companion object {
-        fun create(): CallAdapter.Factory {
-            return CustomCallAdapterFactory()
+        fun create(errorClassType: Type): CallAdapter.Factory {
+            return CustomCallAdapterFactory(errorClassType)
         }
     }
 
@@ -29,9 +30,9 @@ class CustomCallAdapterFactory private constructor() : CallAdapter.Factory() {
             return null
         }
 
-        val errorConverter: Converter<ResponseBody, BaseException> =
-            retrofit.responseBodyConverter(BaseException::class.java, annotations)
+        val converter: Converter<ResponseBody,Any> =
+            retrofit.responseBodyConverter(errorClassType, annotations)
 
-        return CustomCallAdapter(errorConverter)
+        return CustomCallAdapter(converter)
     }
 }

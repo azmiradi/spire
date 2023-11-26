@@ -61,7 +61,7 @@ class KeyStoreManger : IKeyStoreManger {
         authenticationRequired: Boolean?,
     ): SecretKey {
         keyStore.getKey(keyAlias, null)?.let { return it as SecretKey }
-        val encryptionAlgorithm = EncryptionAlgorithm.AES_GCM_NO_PADDING
+        val encryptionAlgorithm = EncryptionAlgorithm.AES_CBC_PKCS7_PADDING
 
         return KeyGenerator.getInstance(encryptionAlgorithm.algorithm, "AndroidKeyStore")
             .apply {

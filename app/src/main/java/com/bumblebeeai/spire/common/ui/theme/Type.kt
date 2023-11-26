@@ -12,7 +12,7 @@ val fontFamily = FontFamily(
     Font(R.font.poppins, FontWeight.Normal)
 )
 
-val Typography = Typography(
+val CustomTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,

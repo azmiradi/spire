@@ -1,20 +1,22 @@
 package com.bumblebeeai.spire.auth.login.data.model.dto
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class LoginDto(
-	@SerialName("access_token")
+	@SerializedName("access_token")
 	val accessToken: String? = null,
 
-	@SerialName("last_name")
+	@SerializedName("last_name")
 	val lastName: String? = null,
 
-	@SerialName("merchant_id")
+	@SerializedName("merchant_id")
 	val merchantId: String? = null,
 
-	@SerialName("token_type")
+	@SerializedName("token_type")
 	val tokenType: String? = null,
 
-	@SerialName("first_name")
+	@SerializedName("first_name")
 	val firstName: String? = null,
 )

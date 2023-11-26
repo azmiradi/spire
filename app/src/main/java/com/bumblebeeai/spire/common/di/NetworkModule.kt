@@ -2,15 +2,15 @@ package com.bumblebeeai.spire.common.di
 
 import com.azmiradi.android_base.configuration.AppConfiguration
 import com.azmiradi.android_base.configuration.AppConfiguration.connectTimeoutSec
-import com.azmiradi.android_base.data.data_sources.remote.factory.CustomCallAdapterFactory
 import com.azmiradi.android_base.data.data_sources.remote.retrofit.ApiService
 import com.azmiradi.android_base.data.data_sources.remote.retrofit.HeadersInterceptor
 import com.azmiradi.android_base.data.data_sources.remote.retrofit.RetrofitNetworkProvider
+import com.azmiradi.android_base.data.data_sources.remote.retrofit.factory.CustomCallAdapterFactory
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
 import com.azmiradi.kotlin_base.domain.repository.remote.INetworkProvider
 import com.bumblebeeai.spire.BuildConfig
-import com.bumblebeeai.spire.auth.login.domain.models.keys.KeyValue
-import com.google.gson.Gson
+import com.bumblebeeai.spire.common.domain.model.enums.CommenKeyValue
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,11 +31,9 @@ object NetworkModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient.Builder,
     ): Retrofit {
-        return Retrofit.Builder()
-            .client(okHttpClient.build())
-            .baseUrl(AppConfiguration.baseURL)
-            .addConverterFactory(GsonConverterFactory.create(Gson()))
-            .addCallAdapterFactory(CustomCallAdapterFactory.create())
+        return Retrofit.Builder().client(okHttpClient.build()).baseUrl(AppConfiguration.baseURL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .addCallAdapterFactory(CustomCallAdapterFactory.create(Nothing::class.java))
             .build()
     }
 
@@ -49,29 +47,29 @@ object NetworkModule {
     fun provideNetworkProvider(apiService: ApiService): INetworkProvider =
         RetrofitNetworkProvider(apiService)
 
-    @Provides
-    @Singleton
-    fun provideHttpLoggingInterceptor() = HttpLoggingInterceptor().apply {
-        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-        else HttpLoggingInterceptor.Level.NONE
-    }
 
     @Provides
     @Singleton
     fun provideHeadersInterceptor(storageKeyValue: IStorageKeyValue): HeadersInterceptor {
         return HeadersInterceptor {
-            mapOf(
-                "Authorization" to "Bearer " + storageKeyValue.getSecuredValue(
-                    KeyValue.TOKEN, KeyAliasValue.TOKEN
+            try {
+                val token = storageKeyValue.getString(
+                    CommenKeyValue.TOKEN
                 )
-            )
+                mapOf(
+                    "Authorization" to "Bearer $token",
+                    "Accept" to "application/json",
+                    "Content-Type" to "application/json"
+                )
+            } catch (e: Exception) {
+                emptyMap()
+            }
         }
     }
 
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor,
         headersInterceptor: HeadersInterceptor,
     ): OkHttpClient.Builder =
         OkHttpClient().newBuilder().apply {
@@ -79,7 +77,10 @@ object NetworkModule {
             retryOnConnectionFailure(true)
             readTimeout(connectTimeoutSec, TimeUnit.SECONDS)
             writeTimeout(connectTimeoutSec, TimeUnit.SECONDS)
-            addInterceptor(httpLoggingInterceptor)
+            addInterceptor(HttpLoggingInterceptor().apply {
+                if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                else HttpLoggingInterceptor.Level.NONE
+            })
             addInterceptor(headersInterceptor)
         }
 }

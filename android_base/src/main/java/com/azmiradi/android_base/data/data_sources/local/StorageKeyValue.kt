@@ -10,9 +10,8 @@ import com.azmiradi.kotlin_base.data.exception.BaseException
 import com.azmiradi.kotlin_base.domain.encryption.ICryptoOperations
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IKeyValue
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
-import com.azmiradi.kotlin_base.utilities.extensions.decodeFromBase64
-import com.azmiradi.kotlin_base.utilities.extensions.encodeToBase64
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.util.Date
@@ -23,6 +22,17 @@ class StorageKeyValue @Inject constructor(
    private val dataStore: DataStore<Preferences>,
    private val cryptoOperations: ICryptoOperations,
 ) : IStorageKeyValue() {
+
+   override suspend fun saveString(storageKey: IKeyValue, value: String) {
+      dataStore.edit {
+         it[stringPreferencesKey(storageKey.keyValue)] = value
+      }
+   }
+
+   override suspend fun getString(storageKey: IKeyValue): String {
+      return dataStore.data.firstOrNull()?.get(stringPreferencesKey(storageKey.keyValue))
+         ?: throw BaseException.Local.NotFoundData(R.string.error_io_unexpected_message)
+   }
 
    override suspend fun saveSecuredValue(
       storageKey: IKeyValue,
@@ -37,7 +47,8 @@ class StorageKeyValue @Inject constructor(
          authenticationRequired = authenticationRequired,
          keyValidityEnd = keyValidityEnd
       ) { preference, byteArray ->
-         preference[stringPreferencesKey(storageKey.keyValue)] = byteArray.encodeToBase64()
+         preference[stringPreferencesKey(storageKey.keyValue)] =
+            String(byteArray)
       }
    }
 
@@ -45,9 +56,10 @@ class StorageKeyValue @Inject constructor(
       storageKey: IKeyValue,
       keyAlias: IKeyValue,
    ): ByteArray {
-      return dataStore.data.secureMap(keyAlias.keyValue, fetchValue = { value ->
-         value[stringPreferencesKey(storageKey.keyValue)]
-      }).firstOrNull()
+      return dataStore.data.secureMap(keyAlias.keyValue,
+         fetchValue = { value ->
+            value[stringPreferencesKey(storageKey.keyValue)]
+         }).firstOrNull()
          ?: throw BaseException.Local.NotFoundData(R.string.error_io_unexpected_message)
    }
 
@@ -66,6 +78,7 @@ class StorageKeyValue @Inject constructor(
          authenticationRequired = authenticationRequired,
          keyValidityEnd = keyValidityEnd
       )
+
       editStore.invoke(it, encryptedValue)
    }
 
@@ -79,9 +92,17 @@ class StorageKeyValue @Inject constructor(
       crossinline fetchValue: (value: Preferences) -> String?,
    ): Flow<ByteArray?> = map { prefs ->
       if (fetchValue(prefs).isNullOrEmpty()) null
-      else cryptoOperations.decryptDataWithAES(
-         keyAlias = keyAlias,
-         data = fetchValue(prefs)!!.decodeFromBase64()
-      )
+      else {
+         cryptoOperations.decryptDataWithAES(
+            keyAlias = keyAlias,
+            data = fetchValue(prefs)?.toByteArray()!!
+         )
+      }
+   }
+
+   override suspend fun hasKey(storageKey: IKeyValue): Boolean {
+      return dataStore.data.map { preference ->
+         preference.contains(key = stringPreferencesKey(storageKey.keyValue))
+      }.first()
    }
 }

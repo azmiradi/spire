@@ -12,6 +12,7 @@ plugins {
     id("kotlin-parcelize")
     kotlin("kapt")
     id("com.google.firebase.crashlytics")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -22,7 +23,7 @@ android {
         applicationId = "com.bumblebeeai.spire"
         minSdk = 24
         targetSdk = 34
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.bumblebeeai.spire.CustomTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -55,11 +56,7 @@ android {
     buildTypes {
 
         debug {
-            isMinifyEnabled = true
-            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
-                mappingFileUploadEnabled = false
-            }
-
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -84,22 +81,18 @@ android {
     productFlavors {
         create("staging") {
             dimension = "environment"
-            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
-                mappingFileUploadEnabled = false
-            }
             versionName = properties.getProperty("VERSION_NAME_STAGING")
             versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_STAGING"))
             buildConfigField("String", "BASE_URL", "\"https://pqziebouzf.execute-api.eu-west-1.amazonaws.com/api/spire_driver_app/\"")
+            buildConfigField("String", "GOOGLE_API_KEY","AIzaSyCA_NPQit11QYtzqkSIpMtwFitNr3LcDyM")
         }
 
         create("production") {
             dimension = "environment"
-            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
-                mappingFileUploadEnabled = true
-            }
             versionName = properties.getProperty("VERSION_NAME_PRODUCTION")
             versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_PRODUCTION"))
             buildConfigField("String", "BASE_URL", "\"https://pqziebouzf.execute-api.eu-west-1.amazonaws.com/api/spire_driver_app/\"")
+            buildConfigField("String", "GOOGLE_API_KEY","\"AIzaSyCA_NPQit11QYtzqkSIpMtwFitNr3LcDyM\"")
         }
     }
 }
@@ -114,25 +107,31 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation(project(mapOf("path" to ":android_base")))
+    implementation(project(mapOf("path" to ":location")))
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
 
     //Test dependencies
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("com.google.truth:truth:1.1.5")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("com.google.dagger:hilt-android-testing:2.44")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
 
-//    //android test dependencies
-//    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-//    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-//    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-//    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-//    androidTestImplementation("com.google.truth:truth:1.1.5")
-//    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-//    androidTestImplementation("app.cash.turbine:turbine:1.0.0")
-//    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-//    androidTestImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-//    androidTestImplementation("app.cash.turbine:turbine:1.0.0")
-//    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    //android test dependencies
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("com.google.truth:truth:1.1.5")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("app.cash.turbine:turbine:1.0.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+
 
     //debug dependencies
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -157,6 +156,19 @@ dependencies {
     implementation("androidx.biometric:biometric:1.0.1")
 
     implementation ("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation ("com.github.TuleSimon:xMaterialccp:1.27")
+    //Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation ("androidx.compose.material:material:1.5.4")
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
+
+    //pagination
+    implementation("androidx.paging:paging-runtime-ktx:3.2.1")
+    implementation("androidx.paging:paging-compose:3.3.0-alpha02")
+    implementation("com.akexorcist:google-direction-library:1.2.1")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.maps.android:maps-compose:2.9.1")
+
 }
 
 tasks.register("increaseStagingVersionCode") {

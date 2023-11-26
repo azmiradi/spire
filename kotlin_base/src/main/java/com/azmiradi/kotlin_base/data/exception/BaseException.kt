@@ -1,5 +1,7 @@
 package com.azmiradi.kotlin_base.data.exception
 
+import com.azmiradi.kotlin_base.utilities.extensions.getModelFromJSON
+import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
 sealed class BaseException(message: String?) : Exception(message) {
@@ -15,12 +17,20 @@ sealed class BaseException(message: String?) : Exception(message) {
         data object Unauthorized : Client(message = "Unauthorized Access.")
 
         data class ResponseValidation(
-            val errors: Map<String, String> = hashMapOf(), override val message: String?
+            val errors: Map<String, String> = hashMapOf(), override val message: String?,
         ) : BaseException(message)
 
         data class Unhandled(val httpErrorCode: Int, override val message: String?) : Client(
             message = "Unhandled client error with code:${httpErrorCode}, and the failure reason: $message"
         )
+
+       data class BodyError(val httpErrorCode: Int, override val message: String?) : Client(
+            message = message
+        ) {
+            fun <ErrorBody> getErrorBody(type: Type): ErrorBody? {
+                return message?.getModelFromJSON<ErrorBody>(type)
+            }
+        }
     }
 
     sealed class Server(message: String? = null) : BaseException(message) {

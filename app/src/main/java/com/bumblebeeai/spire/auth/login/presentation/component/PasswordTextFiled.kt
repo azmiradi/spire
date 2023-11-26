@@ -43,7 +43,7 @@ fun PasswordTextFiled(
         },
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = TextFiledContainerColor),
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(15),
         trailingIcon = {
             val image = if (passwordVisible) Icons.Filled.Visibility
             else Icons.Filled.VisibilityOff
