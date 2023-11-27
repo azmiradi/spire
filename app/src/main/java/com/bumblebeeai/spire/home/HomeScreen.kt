@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,33 +23,49 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.azmiradi.android_base.presentation.component.WebView
+import com.azmiradi.kotlin_base.utilities.extensions.getModelFromJSON
 import com.bumblebeeai.spire.common.domain.model.enums.JobType
 import com.bumblebeeai.spire.common.ui.CustomTopBar
 import com.bumblebeeai.spire.common.ui.theme.CustomTypography
 import com.bumblebeeai.spire.common.ui.theme.UnSelectedItemColor
+import com.bumblebeeai.spire.home.BottomNavRouts.JOB_DETAILS
+import com.bumblebeeai.spire.home.jobs.domain.model.DriverJob
 import com.bumblebeeai.spire.home.jobs.presentation.screens.JobsScreen
+import com.bumblebeeai.spire.job_details.presentation.screens.MapOrderDetailsScreen
 import com.bumblebeeai.spire.on_duty.presentation.OnDutyView
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun HomeScreen() {
     val navController = rememberNavController()
+    val coroutine = rememberCoroutineScope()
+    remember {
+        navController.currentBackStackEntryFlow.onEach {
+            println("Current: " + it.destination.route)
+        }.launchIn(coroutine)
+    }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
     Scaffold(
         bottomBar = {
-            HomeBottomNavigation(navController)
+            HomeBottomNavigation(navController,currentRoute)
         },
         topBar = {
             Column {
                 CustomTopBar()
                 Spacer(modifier = Modifier.height(14.dp))
-                OnDutyView(onDutyChanged = {})
-                Spacer(modifier = Modifier.height(23.dp))
+                if (currentRoute != JOB_DETAILS)
+                {
+                    OnDutyView(onDutyChanged = {})
+                    Spacer(modifier = Modifier.height(23.dp))
+                }
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -68,15 +85,20 @@ fun HomeScreen() {
             composable(BottomNavRouts.MY_ACCOUNT) {
 
             }
+
+            composable(JOB_DETAILS) {
+                val job = it.arguments?.getString("job")
+                    ?.getModelFromJSON<DriverJob>(DriverJob::class.java)
+                job?.let {
+                    MapOrderDetailsScreen(jobItem = job, navController)
+                }
+            }
             composable(BottomNavRouts.HELP) {
 
             }
 
             composable(
-                BottomNavRouts.WEB_VIEW,
-//                dialogProperties = DialogProperties(
-//                    usePlatformDefaultWidth = false
-//                )
+                BottomNavRouts.WEB_VIEW
             ) {
                 it.arguments?.getString("url")?.let {
                     WebView(it) { newUrl ->
@@ -93,10 +115,7 @@ fun HomeScreen() {
 }
 
 @Composable
-fun HomeBottomNavigation(navController: NavController) {
-    var currentDestination by remember {
-        mutableStateOf(BottomNavItem.NewTasks)
-    }
+fun HomeBottomNavigation(navController: NavController, currentRoute: String?) {
     BottomNavigation(contentColor = Color.White, backgroundColor = Color.White) {
         BottomNavItem.values().forEach { screen ->
 
@@ -105,23 +124,22 @@ fun HomeBottomNavigation(navController: NavController) {
                     Icon(
                         painter = painterResource(id = screen.icon),
                         contentDescription = null,
-                        tint = if (currentDestination == screen) MaterialTheme.colorScheme.primary else UnSelectedItemColor
+                        tint = if (currentRoute == screen.screenRoute) MaterialTheme.colorScheme.primary else UnSelectedItemColor
                     )
                 },
                 label = {
                     Text(
                         stringResource(screen.title),
                         style = CustomTypography.labelSmall.copy(
-                            fontWeight = if (currentDestination == screen) FontWeight(700) else FontWeight(
+                            fontWeight = if (currentRoute == screen.screenRoute) FontWeight(700) else FontWeight(
                                 500
                             ),
                             fontSize = 11.sp,
                         )
                     )
                 },
-                selected = currentDestination == screen,
+                selected = currentRoute == screen.screenRoute,
                 onClick = {
-                    currentDestination = screen
                     navController.navigate(screen.screenRoute) {
                         popUpTo(BottomNavItem.NewTasks.screenRoute) {
                             saveState = true

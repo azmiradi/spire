@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,7 +33,7 @@ import com.bumblebeeai.spire.home.jobs.domain.model.DriverJob
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobItem(driverJob: DriverJob, onClick:()->Unit) {
+internal fun JobItem(driverJob: DriverJob, onClick:()->Unit) {
     Card(
         onClick = onClick,
         elevation = CardDefaults.cardElevation(10.dp),

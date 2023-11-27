@@ -5,7 +5,7 @@ import com.azmiradi.kotlin_base.data.exception.BaseException
 import com.azmiradi.kotlin_base.data.models.BaseState
 import com.bumblebeeai.spire.home.jobs.domain.model.DriverJob
 
-class JobsState(
+internal class JobsState(
     val jobs: PagingData<DriverJob>? = null,
     loading: Boolean = false,
     error: BaseException? = null,

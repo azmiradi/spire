@@ -42,22 +42,22 @@ internal class JobsPagingSource constructor(
                 query = query
             )
 
+            val jobList = jobs.data?.data?.filterNotNull()
             LoadResult.Page(
-                data = DriverJobMapper.dtoToDomain(jobs.data?.data?.filterNotNull()),
+                data = DriverJobMapper.dtoToDomain(jobList),
                 prevKey = if (currentPage == 1) null else currentPage - 1,
                 nextKey = if (jobs.data?.data?.isEmpty() == true) null else jobs.data?.currentPage?.plus(
                     1
                 )
             )
-
         } catch (exception: IOException) {
             return LoadResult.Error(exception)
         } catch (exception: HttpException) {
             return LoadResult.Error(exception)
         }
-//        catch (exception: Exception) {
-//             return LoadResult.Error(exception)
-//        }
+        catch (exception: Exception) {
+             return LoadResult.Error(exception)
+        }
     }
 
     override fun getRefreshKey(state: PagingState<Int, DriverJob>): Int? {

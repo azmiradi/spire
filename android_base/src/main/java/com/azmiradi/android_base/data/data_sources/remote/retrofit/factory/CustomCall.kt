@@ -1,6 +1,7 @@
 package com.azmiradi.android_base.data.data_sources.remote.retrofit.factory
 
 import android.util.Log
+import androidx.compose.runtime.produceState
 import com.azmiradi.android_base.R
 import com.azmiradi.kotlin_base.data.exception.BaseException
 import okhttp3.ResponseBody
@@ -60,7 +61,9 @@ class CustomCall(
         when (code) {
             401 -> BaseException.Client.Unauthorized
 
-            in 400..499 -> buildClientException(code, errorBody)
+            in 400..499 -> {
+                buildClientException(code, errorBody)
+            }
 
             in 500..599 -> BaseException.Server.InternalServerError(
                 httpErrorCode = code, errorBody?.string()

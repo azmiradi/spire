@@ -15,4 +15,6 @@ internal interface IJobDetailsRepository {
         images: List<MultipartBody.Part>?,
         signature: MultipartBody.Part?,
     ): String
+
+
 }

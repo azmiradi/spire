@@ -13,7 +13,7 @@ import com.bumblebeeai.spire.home.jobs.domain.repositories.IJobsRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class JobsRepository @Inject constructor(
+internal class JobsRepository @Inject constructor(
     private val localDataSource: IJobsLocalDataSource,
     private val remoteDataSource: IJobsRemoteDataSource,
 ) : IJobsRepository {

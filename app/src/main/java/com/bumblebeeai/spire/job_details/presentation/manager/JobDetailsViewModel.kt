@@ -6,6 +6,7 @@ import com.akexorcist.googledirection.GoogleDirection
 import com.akexorcist.googledirection.model.Direction
 import com.akexorcist.googledirection.model.Route
 import com.azmiradi.android_base.presentation.manager.BaseViewModel
+import com.azmiradi.kotlin_base.data.exception.BaseException
 import com.azmiradi.kotlin_base.data.models.Resource
 import com.bumblebeeai.spire.BuildConfig
 import com.bumblebeeai.spire.job_details.domain.models.LocationDirection
@@ -32,7 +33,10 @@ internal class JobDetailsViewModel @Inject constructor(
                 updateJobStatus(event.updateJobStatusRequest)
             }
 
-            is JobDetailsEvent.GetJobDetails -> TODO()
+            is JobDetailsEvent.GetJobLocationDirections -> getDirections(
+                event.origin,
+                event.destination
+            )
         }
     }
 
@@ -71,12 +75,17 @@ internal class JobDetailsViewModel @Inject constructor(
                                 route?.legList?.getOrNull(0)?.duration?.text,
                                 route?.legList?.getOrNull(0)?.distance?.text,
                             )
+                            emit(JobDetailsState(locationDirection = data))
+                        } else {
+                            emit(JobDetailsState(error = BaseException.Unknown(direction.errorMessage)))
                         }
+                    } else {
+                        emit(JobDetailsState(error = BaseException.Unknown("UnKnown Error")))
                     }
                 }
 
                 override fun onDirectionFailure(throwable: Throwable) {
-
+                    emit(JobDetailsState(error = BaseException.Unknown(throwable.message)))
                 }
             })
     }

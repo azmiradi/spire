@@ -84,7 +84,7 @@ android {
             versionName = properties.getProperty("VERSION_NAME_STAGING")
             versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_STAGING"))
             buildConfigField("String", "BASE_URL", "\"https://pqziebouzf.execute-api.eu-west-1.amazonaws.com/api/spire_driver_app/\"")
-            buildConfigField("String", "GOOGLE_API_KEY","AIzaSyCA_NPQit11QYtzqkSIpMtwFitNr3LcDyM")
+            buildConfigField("String", "GOOGLE_API_KEY","\"AIzaSyDJRwjLcxiktE55PBDlc306yltUF-7HSZw\"")
         }
 
         create("production") {
@@ -92,7 +92,7 @@ android {
             versionName = properties.getProperty("VERSION_NAME_PRODUCTION")
             versionCode = Integer.parseInt(properties.getProperty("VERSION_CODE_PRODUCTION"))
             buildConfigField("String", "BASE_URL", "\"https://pqziebouzf.execute-api.eu-west-1.amazonaws.com/api/spire_driver_app/\"")
-            buildConfigField("String", "GOOGLE_API_KEY","\"AIzaSyCA_NPQit11QYtzqkSIpMtwFitNr3LcDyM\"")
+            buildConfigField("String", "GOOGLE_API_KEY","\"AIzaSyDJRwjLcxiktE55PBDlc306yltUF-7HSZw\"")
         }
     }
 }

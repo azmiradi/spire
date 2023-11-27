@@ -11,9 +11,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.azmiradi.kotlin_base.utilities.extensions.toJson
 import com.bumblebeeai.spire.common.domain.model.enums.JobType
 import com.bumblebeeai.spire.common.ext.convertToBaseState
 import com.bumblebeeai.spire.common.ui.AppCompose
+import com.bumblebeeai.spire.home.BottomNavRouts.JOB_DETAILS
 import com.bumblebeeai.spire.home.BottomNavRouts.WEB_VIEW
 import com.bumblebeeai.spire.home.jobs.presentation.component.JobItem
 import com.bumblebeeai.spire.home.jobs.presentation.manager.JobEvent
@@ -26,11 +28,11 @@ fun JobsScreen(jobType: JobType, navController: NavHostController) {
     val viewModel = hiltViewModel<JobsViewModel>()
     val state = viewModel.viewState
 
-    val jobs = state.collectAsLazyPagingItems()
-
     LaunchedEffect(key1 = Unit) {
         viewModel.onEvent(JobEvent.GetJobs(jobType))
     }
+
+    val jobs = state.collectAsLazyPagingItems()
 
     AppCompose(baseState = jobs.convertToBaseState(),
         onVachelCheckIsRequired = {
@@ -46,7 +48,9 @@ fun JobsScreen(jobType: JobType, navController: NavHostController) {
             items(jobs.itemCount) {
                 jobs[it]?.let { it1 ->
                     JobItem(driverJob = it1) {
-
+                        val job =
+                            URLEncoder.encode(jobs[it].toJson(), StandardCharsets.UTF_8.toString())
+                        navController.navigate(JOB_DETAILS.replace("{job}", job))
                     }
                 }
             }

@@ -12,6 +12,7 @@ object BottomNavRouts {
     const val NEW_JOBS = "new_jobs"
     const val MY_JOBS = "my_jobs"
     const val MY_ACCOUNT = "my_account"
+    const val JOB_DETAILS = "job_details/{job}"
     const val HELP = "help"
     const val WEB_VIEW = "web_view/{url}"
 

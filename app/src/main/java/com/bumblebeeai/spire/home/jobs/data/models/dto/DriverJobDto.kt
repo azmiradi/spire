@@ -25,7 +25,7 @@ data class Data(
 	val perPage: Int? = null,
 
 	@field:SerializedName("data")
-	val data: List<DriverJobItem?>? = null,
+	val data: List<DriverJobItemDto?>? = null,
 
 	@field:SerializedName("last_page")
 	val lastPage: Int? = null,
@@ -61,7 +61,7 @@ data class Data(
 	val currentPage: Int? = null
 )
 
-data class DriverJobItem(
+data class DriverJobItemDto(
 
 	@field:SerializedName("ct_job_number")
 	val ctJobNumber: String? = null,
@@ -85,7 +85,7 @@ data class DriverJobItem(
 	val isFnol: Int? = null,
 
 	@field:SerializedName("vehicle_lat")
-	val vehicleLat: String? = null,
+	val vehicleLat: Double? = null,
 
 	@field:SerializedName("replacement_base_id")
 	val replacementBaseId: Any? = null,
@@ -94,7 +94,7 @@ data class DriverJobItem(
 	val eta: String? = null,
 
 	@field:SerializedName("dest_lat")
-	val destLat: String? = null,
+	val destLat: Double? = null,
 
 	@field:SerializedName("ans_job_number")
 	val ansJobNumber: Any? = null,
@@ -115,7 +115,7 @@ data class DriverJobItem(
 	val fnolLon: Any? = null,
 
 	@field:SerializedName("vehicle_lon")
-	val vehicleLon: String? = null,
+	val vehicleLung: Double? = null,
 
 	@field:SerializedName("odometer")
 	val odometer: String? = null,
@@ -172,13 +172,13 @@ data class DriverJobItem(
 	val secondSignature: Any? = null,
 
 	@field:SerializedName("dest_lon")
-	val destLon: String? = null,
+	val destLung: Double? = null,
 
 	@field:SerializedName("is_rescheduled")
 	val isRescheduled: Int? = null,
 
 	@field:SerializedName("alternate_phone")
-	val alternatePhone: Any? = null,
+	val alternatePhone: String? = null,
 
 	@field:SerializedName("assigned_by")
 	val assignedBy: String? = null,
@@ -319,7 +319,7 @@ data class DriverJobItem(
 	val customerName: String? = null,
 
 	@field:SerializedName("caller_number")
-	val callerNumber: Any? = null,
+	val callerNumber: String? = null,
 
 	@field:SerializedName("override_reason")
 	val overrideReason: String? = null

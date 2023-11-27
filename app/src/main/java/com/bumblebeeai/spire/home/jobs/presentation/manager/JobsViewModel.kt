@@ -8,10 +8,12 @@ import com.bumblebeeai.spire.common.domain.model.enums.JobType
 import com.bumblebeeai.spire.home.jobs.domain.model.DriverJob
 import com.bumblebeeai.spire.home.jobs.domain.usecases.GetJobsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel

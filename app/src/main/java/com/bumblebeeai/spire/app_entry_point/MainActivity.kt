@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import com.azmiradi.kotlin_base.domain.repository.local.keyValue.IStorageKeyValue
+import com.bumblebeeai.spire.app_entry_point.navigation.presentation.screens.NavigationScreensController
 import com.bumblebeeai.spire.common.ui.theme.SpireTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -27,24 +28,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SpireTheme {
-                var input by rememberSaveable {
-                    mutableStateOf("")
-                }
-                //NavigationScreensController()
-                Column(modifier = Modifier.fillMaxSize()) {
-                    TextField(value = input,
-                        onValueChange = {
-                            input = it
-                        })
-
-                    Button(onClick = {
-
-                    }) {
-
-                    }
-
-                    Text(text = "")
-                }
+                NavigationScreensController()
             }
         }
 
