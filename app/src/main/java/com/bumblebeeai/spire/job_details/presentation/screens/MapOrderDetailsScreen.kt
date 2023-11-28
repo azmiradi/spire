@@ -9,24 +9,34 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.azmi.location.DefaultLocationClient
 import com.bumblebeeai.spire.R
+import com.bumblebeeai.spire.common.ext.convertTextToRequestBody
 import com.bumblebeeai.spire.common.ui.AppCompose
+import com.bumblebeeai.spire.home.BottomNavRouts.COMPLETE_JOB
+import com.bumblebeeai.spire.home.BottomNavRouts.JOB_DETAILS
 import com.bumblebeeai.spire.home.jobs.domain.model.DriverJob
 import com.bumblebeeai.spire.home.jobs.domain.model.enums.JobStatus
+import com.bumblebeeai.spire.job_details.domain.models.LocationDirection
+import com.bumblebeeai.spire.job_details.domain.models.UpdateJobStatusRequest
 import com.bumblebeeai.spire.job_details.presentation.component.JobInformationCard
 import com.bumblebeeai.spire.job_details.presentation.manager.JobDetailsEvent
 import com.bumblebeeai.spire.job_details.presentation.manager.JobDetailsViewModel
@@ -48,59 +58,102 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 internal fun MapOrderDetailsScreen(
-    jobItem: DriverJob,
-    navigationController: NavHostController,
+    jobID: String,
+    navController: NavHostController,
 ) {
+    var isExpandMap by rememberSaveable {
+        mutableStateOf(true)
+    }
     val viewModel = hiltViewModel<JobDetailsViewModel>()
     val state = viewModel.viewState.collectAsState().value
-    val currentLocation = remember {
+
+    var currentLocation by remember {
         mutableStateOf<Location?>(null)
     }
     val isLocationDetermining = remember {
         mutableStateOf(true)
     }
 
+    var driverJob by remember {
+        mutableStateOf<DriverJob?>(null)
+    }
+
+    var locationDirection by remember {
+        mutableStateOf<LocationDirection?>(null)
+    }
     val context = LocalContext.current
 
-    DisposableEffect(Unit) {
-        val defaultLocationClient = DefaultLocationClient(
+    val defaultLocationClient = remember {
+        DefaultLocationClient(
             LocationServices.getFusedLocationProviderClient(context as Activity)
         )
+    }
 
-        defaultLocationClient.getLocationUpdates{
-            isLocationDetermining.value = false
-            currentLocation.value = it
-            viewModel.onEvent(
-                JobDetailsEvent.GetJobLocationDirections(
-                    LatLng(jobItem.vehicleLocation.lat, jobItem.vehicleLocation.lung),
-                    LatLng(it.latitude, it.longitude)
-                )
+    LaunchedEffect(key1 = Unit) {
+        viewModel.onEvent(
+            JobDetailsEvent.GetJobDetails(
+                jobID = jobID
             )
+        )
+    }
+    state.driverJob?.let {
+        driverJob = it
+        if (it.status == JobStatus.ArrivedLocation || it.status == JobStatus.ArrivedDestination) {
+            navController.navigate(COMPLETE_JOB.replace("{job_id}", it.id.toString())) {
+                popUpTo(JOB_DETAILS) {
+                    inclusive = true
+                }
+            }
+        } else {
+            defaultLocationClient.getLocationUpdates { location ->
+                isLocationDetermining.value = false
+                currentLocation = location
+                viewModel.onEvent(
+                    JobDetailsEvent.GetJobLocationDirections(
+                        LatLng(
+                            state.driverJob.vehicleLocation.lat,
+                            state.driverJob.vehicleLocation.lung
+                        ),
+                        LatLng(location.latitude, location.longitude)
+                    )
+                )
+            }
         }
-
-        onDispose(defaultLocationClient::release)
-    }
-    val showDetailsDialog = remember {
-        mutableStateOf(false)
     }
 
+    state.locationDirection?.let {
+        locationDirection = it
+    }
+
+    state.updateJobStatus?.let {
+        viewModel.onEvent(
+            JobDetailsEvent.GetJobDetails(
+                jobID
+            )
+        )
+    }
 
     AppCompose(
         state
     ) {
-        if (jobItem.status.isValidStatus()) {
-            val currentLatLng = LatLng(
-                currentLocation.value?.latitude ?: 0.0,
-                currentLocation.value?.longitude ?: 0.0
-            )
-            val pickupLatLng = LatLng(
-                jobItem.vehicleLocation.lat,
-                jobItem.vehicleLocation.lung
-            )
+        currentLocation?.let {
+            val currentLatLng = remember {
+                LatLng(
+                    currentLocation?.latitude ?: 0.0,
+                    currentLocation?.longitude ?: 0.0
+                )
+            }
+
+            val pickupLatLng = remember {
+                LatLng(
+                    driverJob?.vehicleLocation?.lat ?: 0.0,
+                    driverJob?.vehicleLocation?.lung ?: 0.0
+                )
+            }
 
             val cameraPositionState: CameraPositionState = rememberCameraPositionState {
                 position = CameraPosition.fromLatLngZoom(
-                    currentLatLng, 11f
+                    currentLatLng, 3f
                 )
             }
             val latLngBounds = remember {
@@ -137,43 +190,60 @@ internal fun MapOrderDetailsScreen(
                         title = "Pickup Location",
                         iconResourceId = R.drawable.icon_pickup2
                     )
-                    state.locationDirection?.let {
+                    locationDirection?.let {
                         Polyline(
                             points = it.points ?: emptyList(), color = Color(0xff50BEE8)
                         )
                     }
                 }
 
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = !showDetailsDialog.value,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(
-                            start = 20.dp, end = 20.dp, bottom = 20.dp
-                        )
+                IconButton(
+                    onClick = {
+                        isExpandMap = !isExpandMap
+                    }, modifier = Modifier
+                        .align(Alignment.TopStart)
                 ) {
-                    JobInformationCard(
-                        jobItem = jobItem,
-                        modifier = Modifier,
-                        timeArrival = state.locationDirection?.duration
-                            ?: "---",
-                        distance = state.locationDirection?.distance,
-                        onUpdateClick = {
-
-                        }
+                    androidx.compose.material.Icon(
+                        painter = painterResource(id = R.drawable.expanded_map),
+                        contentDescription = ""
                     )
+                }
+
+                if (isExpandMap) {
+                    if (driverJob != null)
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(
+                                    horizontal = 19.dp,
+                                    vertical = 14.dp
+                                )
+                        ) {
+                            JobInformationCard(
+                                jobItem = driverJob!!,
+                                modifier = Modifier,
+                                timeArrival = locationDirection?.duration
+                                    ?: "---",
+                                distance = locationDirection?.distance,
+                                onUpdateClick = {
+                                    viewModel.onEvent(
+                                        JobDetailsEvent.UpdateJobDetails(
+                                            UpdateJobStatusRequest(
+                                                status = driverJob?.status?.getNextStatus(state.driverJob?.isSinglePoint() == true)?.status?.convertTextToRequestBody()!!,
+                                                jobId = driverJob?.id.toString().convertTextToRequestBody(),
+                                            )
+                                        )
+                                    )
+                                }
+                            )
+                        }
                 }
             }
         }
     }
 
-
     BackHandler {
-        if (showDetailsDialog.value) {
-            showDetailsDialog.value = false
-        } else {
-            navigationController.popBackStack()
-        }
+        navController.popBackStack()
     }
 }
 
@@ -186,9 +256,11 @@ fun MapMarker(
     position: LatLng, title: String, @DrawableRes iconResourceId: Int,
 ) {
     val context = LocalContext.current
-    val icon = bitmapDescriptorFromVector(
-        context, iconResourceId
-    )
+    val icon = remember {
+        bitmapDescriptorFromVector(
+            context, iconResourceId
+        )
+    }
     Marker(
         state = MarkerState(position = position),
         title = title,

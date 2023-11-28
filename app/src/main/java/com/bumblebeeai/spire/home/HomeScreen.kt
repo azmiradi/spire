@@ -12,10 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,14 +27,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.azmiradi.android_base.presentation.component.WebView
-import com.azmiradi.kotlin_base.utilities.extensions.getModelFromJSON
 import com.bumblebeeai.spire.common.domain.model.enums.JobType
 import com.bumblebeeai.spire.common.ui.CustomTopBar
 import com.bumblebeeai.spire.common.ui.theme.CustomTypography
 import com.bumblebeeai.spire.common.ui.theme.UnSelectedItemColor
 import com.bumblebeeai.spire.home.BottomNavRouts.JOB_DETAILS
-import com.bumblebeeai.spire.home.jobs.domain.model.DriverJob
 import com.bumblebeeai.spire.home.jobs.presentation.screens.JobsScreen
+import com.bumblebeeai.spire.job_details.presentation.screens.CompleteJobForm
 import com.bumblebeeai.spire.job_details.presentation.screens.MapOrderDetailsScreen
 import com.bumblebeeai.spire.on_duty.presentation.OnDutyView
 import kotlinx.coroutines.flow.launchIn
@@ -87,14 +84,20 @@ fun HomeScreen() {
             }
 
             composable(JOB_DETAILS) {
-                val job = it.arguments?.getString("job")
-                    ?.getModelFromJSON<DriverJob>(DriverJob::class.java)
-                job?.let {
-                    MapOrderDetailsScreen(jobItem = job, navController)
+                val jobId = it.arguments?.getString("job_id")
+                jobId?.let {
+                    MapOrderDetailsScreen(jobID = jobId, navController)
                 }
             }
+
             composable(BottomNavRouts.HELP) {
 
+            }
+            composable(BottomNavRouts.COMPLETE_JOB) {
+                val jobId = it.arguments?.getString("job_id")
+                jobId?.let {
+                    CompleteJobForm(it, navController)
+                }
             }
 
             composable(

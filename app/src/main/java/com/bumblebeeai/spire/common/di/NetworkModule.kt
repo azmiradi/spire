@@ -56,10 +56,14 @@ object NetworkModule {
                 val token = storageKeyValue.getString(
                     CommenKeyValue.TOKEN
                 )
+                val merchantId = storageKeyValue.getString(
+                    CommenKeyValue.MERCHANT_ID
+                )
                 mapOf(
                     "Authorization" to "Bearer $token",
                     "Accept" to "application/json",
-                    "Content-Type" to "application/json"
+                    "Content-Type" to "application/json",
+                    "merchant_id" to merchantId
                 )
             } catch (e: Exception) {
                 emptyMap()

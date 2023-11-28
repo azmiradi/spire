@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 internal data class DriverJob(
      val date: String,
      val jobDetails: String,
+     val vehicleDetails: String,
      val locationAddress: String,
      val id: Int,
      val jobNumber: String?,
@@ -22,4 +23,6 @@ internal data class DriverJob(
           val lat: Double,
           val lung: Double,
      ) : Parcelable
+
+     fun isSinglePoint() = destinationLocation == null
 }

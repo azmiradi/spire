@@ -22,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.bumblebeeai.spire.R
 import com.bumblebeeai.spire.common.ui.AppCompose
 import com.bumblebeeai.spire.common.ui.text_inputs.BaseTextWithTitle
@@ -33,9 +33,8 @@ import com.bumblebeeai.spire.common.ui.text_inputs.InputLabelTitle
 import com.bumblebeeai.spire.common.ui.theme.CustomTypography
 import com.bumblebeeai.spire.job_details.presentation.manager.JobDetailsViewModel
 
-@Preview
 @Composable
-fun CompleteJobForm() {
+fun CompleteJobForm(s: String, navController: NavHostController) {
     val viewModel = hiltViewModel<JobDetailsViewModel>()
     val state = viewModel.viewState.collectAsState().value
 
@@ -52,22 +51,30 @@ fun CompleteJobForm() {
             BaseTextWithTitle(
                 label = stringResource(id = R.string.odometer),
                 hint = stringResource(id = R.string.ex15000),
-            ) {}
+            ) {
+
+            }
             BaseTextWithTitle(
                 label = stringResource(id = R.string.faults),
                 hint = stringResource(id = R.string.add_faults),
-            ) {}
+            ) {
+
+            }
 
             BaseTextWithTitle(
                 label = stringResource(id = R.string.outcomes),
                 hint = stringResource(id = R.string.add_outcomes),
-            ) {}
+            ) {
+
+            }
             BaseTextWithTitle(
                 height = 75.dp,
                 isMandatory = false,
                 label = stringResource(id = R.string.notes),
                 hint = stringResource(id = R.string.add_note),
-            ) {}
+            ) {
+
+            }
 
             UploadImages()
             Signature()

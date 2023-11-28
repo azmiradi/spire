@@ -36,7 +36,10 @@ internal object DriverJobMapper : Mapper<DriverJobItemDto, DriverJob>() {
                 ),
             status = JobStatus.values().find { model.statusExternal == it.status }
                 ?: throw BaseException.Unknown("Not found status"),
-            jobNumber = model.ctJobNumber
+            jobNumber = model.ctJobNumber,
+            vehicleDetails = model.theVehicle?.run {
+                "Make:${make ?: DEFAULT_STRING_VALUE}/Model:${model.theVehicle.model ?: DEFAULT_STRING_VALUE}/Version:${versionType ?: DEFAULT_STRING_VALUE}/Color:${colour ?: DEFAULT_STRING_VALUE}/Transmission:${transmission ?: DEFAULT_STRING_VALUE}"
+            } ?: DEFAULT_STRING_VALUE
         )
     }
 }

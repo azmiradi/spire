@@ -5,7 +5,6 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,9 +33,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import com.azmiradi.kotlin_base.utilities.constants.DEFAULT_STRING_VALUE
 import com.bumblebeeai.spire.R
 import com.bumblebeeai.spire.common.ext.callNumber
 import com.bumblebeeai.spire.home.jobs.domain.model.DriverJob
+import com.bumblebeeai.spire.home.jobs.domain.model.enums.JobStatus
 
 @Composable
 internal fun JobInformationCard(
@@ -76,7 +77,6 @@ internal fun JobInformationCard(
                 .show()
         }
     }
-
 
     Card(
         modifier,
@@ -118,7 +118,7 @@ internal fun JobInformationCard(
                         )
 
                         Text(
-                            text = "10 JUN, 11:58 ",
+                            text = jobItem.date,
                             style = TextStyle(
                                 fontSize = 10.8.sp,
                                 fontFamily = FontFamily(Font(R.font.poppins)),
@@ -131,135 +131,8 @@ internal fun JobInformationCard(
 
             }
 
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(id = R.drawable.icon_pickup2),
-                    contentDescription = "image description",
-                    modifier = Modifier
-                        .padding(1.dp)
-                        .width(15.6.dp)
-                        .height(16.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Text(
-                        text = "Vehicle Location",
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(600),
-                            color = Color(0xFF979797),
-                        )
-                    )
-                    Text(
-                        text = "21 Pinfold Ln, Mickletown Methley, Methley, Leeds LS26 9AA, UK",
-                        style = TextStyle(
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(700),
-                            color = Color(0xFF4D4D4D),
-                        )
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(5.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(id = R.drawable.icon_pickup),
-                    contentDescription = "image description",
-                    modifier = Modifier
-                        .padding(1.dp)
-                        .width(15.6.dp)
-                        .height(16.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Text(
-                        text = "Destination",
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(600),
-                            color = Color(0xFF979797),
-                        )
-                    )
-                    Text(
-                        text = "21 Pinfold Ln, Mickletown Methley, Methley, Leeds LS26 9AA, UK",
-                        style = TextStyle(
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(700),
-                            color = Color(0xFF4D4D4D),
-                        )
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(5.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(id = R.drawable.car),
-                    contentDescription = "image description",
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .width(16.94128.dp)
-                        .height(13.09101.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Text(
-                        text = "Vehicle Details",
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(600),
-                            color = Color(0xFF979797),
-                        )
-                    )
-                    Text(
-                        text = "21 Pinfold Ln, Mickletown Methley, Methley, Leeds LS26 9AA, UK",
-                        style = TextStyle(
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(700),
-                            color = Color(0xFF4D4D4D),
-                        )
-                    )
-                }
+            JobInformationCard(jobItem)
 
-            }
-            Spacer(modifier = Modifier.height(5.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(id = R.drawable.file),
-                    contentDescription = "image description",
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .width(11.92727.dp)
-                        .height(15.70669.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Text(
-                        text = "Job Details",
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(600),
-                            color = Color(0xFF979797),
-                        )
-                    )
-                    Text(
-                        text = "21 Pinfold Ln, Mickletown Methley, Methley, Leeds LS26 9AA, UK",
-                        style = TextStyle(
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontWeight = FontWeight(700),
-                            color = Color(0xFF4D4D4D),
-                        )
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = onUpdateClick, modifier = Modifier
                     .width(296.dp)
@@ -268,9 +141,202 @@ internal fun JobInformationCard(
                 shape = RoundedCornerShape(size = 90.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF3A6EB9))
             ) {
-                Text(text = jobItem.status.title, color = Color.White)
+                Text(
+                    text = jobItem.status.getNextStatus(jobItem.isSinglePoint())?.title ?: "",
+                    color = Color.White
+                )
             }
             Spacer(modifier = Modifier.height(13.dp))
+        }
+    }
+}
+
+@Composable
+private fun JobInformationCard(
+    jobItem: DriverJob,
+) {
+    when (jobItem.status) {
+        JobStatus.Assigned -> {
+            RowCardInfo(
+                title = "Vehicle Location",
+                value = jobItem.vehicleLocation.address,
+                icon = R.drawable.icon_pickup2
+            )
+
+            RowCardInfo(
+                title = "Destination",
+                value = jobItem.destinationLocation?.address ?: DEFAULT_STRING_VALUE,
+                icon = R.drawable.icon_pickup2
+            )
+
+            RowCardInfo(
+                title = "Vehicle Details",
+                value = jobItem.vehicleDetails,
+                icon = R.drawable.file
+            )
+
+            RowCardInfo(
+                title = "Job Details",
+                value = jobItem.jobDetails,
+                icon = R.drawable.file
+            )
+        }
+        JobStatus.Accepted -> {
+            RowCardInfo(
+                title = "Vehicle Location",
+                value = jobItem.vehicleLocation.address,
+                icon = R.drawable.icon_pickup2,
+                sideIcon = R.drawable.btn_map,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Customer Details",
+                value = jobItem.destinationLocation?.address ?: DEFAULT_STRING_VALUE,
+                icon = R.drawable.icon_user,
+                sideIcon = R.drawable.btn_call,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Vehicle Details",
+                value = jobItem.vehicleDetails,
+                icon = R.drawable.file
+            )
+
+            RowCardInfo(
+                title = "Job Details",
+                value = jobItem.jobDetails,
+                icon = R.drawable.file,
+                sideIcon = R.drawable.call_center,
+                sideIconAction = {
+
+                }
+            )
+        }
+        JobStatus.OnTheWayLocation -> {
+            RowCardInfo(
+                title = "Vehicle Location",
+                value = jobItem.vehicleLocation.address,
+                icon = R.drawable.icon_pickup2,
+                sideIcon = R.drawable.btn_map,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Customer Details",
+                value = jobItem.destinationLocation?.address ?: DEFAULT_STRING_VALUE,
+                icon = R.drawable.icon_user,
+                sideIcon = R.drawable.btn_call,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Vehicle Details",
+                value = jobItem.vehicleDetails,
+                icon = R.drawable.file
+            )
+
+            RowCardInfo(
+                title = "Job Details",
+                value = jobItem.jobDetails,
+                icon = R.drawable.file,
+                sideIcon = R.drawable.call_center,
+                sideIconAction = {
+
+                }
+            )
+        }
+        JobStatus.ArrivedLocation -> {
+
+        }
+        JobStatus.CompletedLocation -> {
+            RowCardInfo(
+                title = "Destination",
+                value = jobItem.vehicleLocation.address,
+                icon = R.drawable.icon_pickup,
+                sideIcon = R.drawable.btn_map,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Contact Person Details",
+                value = jobItem.destinationLocation?.address ?: DEFAULT_STRING_VALUE,
+                icon = R.drawable.icon_user,
+                sideIcon = R.drawable.btn_call,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Vehicle Details",
+                value = jobItem.vehicleDetails,
+                icon = R.drawable.file
+            )
+
+            RowCardInfo(
+                title = "Job Details",
+                value = jobItem.jobDetails,
+                icon = R.drawable.file,
+                sideIcon = R.drawable.call_center,
+                sideIconAction = {
+
+                }
+            )
+        }
+        JobStatus.OnTheWayDestination -> {
+            RowCardInfo(
+                title = "Destination",
+                value = jobItem.vehicleLocation.address,
+                icon = R.drawable.icon_pickup,
+                sideIcon = R.drawable.btn_map,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Contact Person Details",
+                value = jobItem.destinationLocation?.address ?: DEFAULT_STRING_VALUE,
+                icon = R.drawable.icon_user,
+                sideIcon = R.drawable.btn_call,
+                sideIconAction = {
+
+                }
+            )
+
+            RowCardInfo(
+                title = "Vehicle Details",
+                value = jobItem.vehicleDetails,
+                icon = R.drawable.file
+            )
+
+            RowCardInfo(
+                title = "Job Details",
+                value = jobItem.jobDetails,
+                icon = R.drawable.file,
+                sideIcon = R.drawable.call_center,
+                sideIconAction = {
+
+                }
+            )
+        }
+        JobStatus.ArrivedDestination -> {
+
+        }
+        JobStatus.Completed -> {
+
         }
     }
 }

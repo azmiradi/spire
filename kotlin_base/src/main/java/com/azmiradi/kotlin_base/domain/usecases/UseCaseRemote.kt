@@ -25,7 +25,8 @@ abstract class UseCaseRemote<Domain, in Body> : UseCase<Domain, Body>() {
 
     override suspend fun <M> runFlow(
         requestExecution: Flow<M>, onResult: suspend (Resource<Domain>) -> Unit
-    ): Flow<M> = requestExecution.catch { e ->
+    ): Flow<M> = requestExecution
+        .catch { e ->
         val failureResource = if (e is BaseException) e
         else BaseException.Unknown(message = "Unknown error in UseCaseRemote: $e")
         onResult.invoke(invokeFailureState(failureResource))

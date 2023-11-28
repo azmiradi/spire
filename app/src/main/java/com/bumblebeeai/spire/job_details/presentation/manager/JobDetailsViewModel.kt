@@ -9,8 +9,12 @@ import com.azmiradi.android_base.presentation.manager.BaseViewModel
 import com.azmiradi.kotlin_base.data.exception.BaseException
 import com.azmiradi.kotlin_base.data.models.Resource
 import com.bumblebeeai.spire.BuildConfig
+import com.bumblebeeai.spire.common.domain.model.enums.CommenKeyValue
+import com.bumblebeeai.spire.common.domain.use_cases.GetValueKeyFromLocalUseCase
+import com.bumblebeeai.spire.job_details.domain.models.JobDetailsRequest
 import com.bumblebeeai.spire.job_details.domain.models.LocationDirection
 import com.bumblebeeai.spire.job_details.domain.models.UpdateJobStatusRequest
+import com.bumblebeeai.spire.job_details.domain.usecases.GetJobDetailsUseCase
 import com.bumblebeeai.spire.job_details.domain.usecases.UpdateJobStatusUseCase
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class JobDetailsViewModel @Inject constructor(
     private val updateJobStatusUseCase: UpdateJobStatusUseCase,
+    private val getJobStatusUseCase: GetJobDetailsUseCase,
+    private val getValueKeyFromLocalUseCase: GetValueKeyFromLocalUseCase,
 ) : BaseViewModel<JobDetailsState, JobDetailsEvent>() {
     override fun createInitialState(): JobDetailsState {
         return JobDetailsState()
@@ -37,6 +43,10 @@ internal class JobDetailsViewModel @Inject constructor(
                 event.origin,
                 event.destination
             )
+
+            is JobDetailsEvent.GetJobDetails -> {
+                getJobDetails(event.jobID)
+            }
         }
     }
 
@@ -59,7 +69,6 @@ internal class JobDetailsViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-
 
     private fun getDirections(origin: LatLng, destination: LatLng) {
         GoogleDirection.withServerKey(BuildConfig.GOOGLE_API_KEY)
@@ -90,5 +99,37 @@ internal class JobDetailsViewModel @Inject constructor(
             })
     }
 
+
+    private fun getJobDetails(jobID: String) {
+        getValueKeyFromLocalUseCase.invoke(CommenKeyValue.MERCHANT_ID).onEach {
+            when (it) {
+                is Resource.Failure -> emit(JobDetailsState(error = it.exception))
+                Resource.Loading -> {}
+                is Resource.Success -> {
+                    getJobStatusUseCase.invoke(
+                        JobDetailsRequest(
+                            jobID = jobID,
+                            merchantId = it.model
+                        )
+                    ).onEach {
+                        when (it) {
+                            is Resource.Failure -> {
+                                emit(JobDetailsState(error = it.exception))
+                            }
+
+                            Resource.Loading -> {
+                                emit(JobDetailsState(loading = true))
+                            }
+
+                            is Resource.Success -> {
+                                emit(JobDetailsState(driverJob = it.model))
+                            }
+                        }
+                    }.launchIn(viewModelScope)
+                }
+            }
+
+        }.launchIn(viewModelScope)
+    }
 
 }

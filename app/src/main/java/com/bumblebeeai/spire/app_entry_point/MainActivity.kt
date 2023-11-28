@@ -22,8 +22,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -31,11 +29,6 @@ class MainActivity : FragmentActivity() {
                 NavigationScreensController()
             }
         }
-
-
     }
-
-
-
 }
 

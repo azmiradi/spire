@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.azmiradi.kotlin_base.utilities.extensions.toJson
 import com.bumblebeeai.spire.common.domain.model.enums.JobType
 import com.bumblebeeai.spire.common.ext.convertToBaseState
 import com.bumblebeeai.spire.common.ui.AppCompose
@@ -48,9 +47,14 @@ fun JobsScreen(jobType: JobType, navController: NavHostController) {
             items(jobs.itemCount) {
                 jobs[it]?.let { it1 ->
                     JobItem(driverJob = it1) {
-                        val job =
-                            URLEncoder.encode(jobs[it].toJson(), StandardCharsets.UTF_8.toString())
-                        navController.navigate(JOB_DETAILS.replace("{job}", job))
+                        jobs[it]?.id?.let { jobId ->
+                            navController.navigate(
+                                JOB_DETAILS.replace(
+                                    "{job_id}",
+                                    jobId.toString()
+                                )
+                            )
+                        }
                     }
                 }
             }
